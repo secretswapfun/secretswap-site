@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecretSwap.fun - Échangez vos secrets anonymement</title>
+    <!-- Intégration du SDK PayPal -->
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=EUR"></script>
     <style>
         :root {
             --coral: #FF7F50;
@@ -15,6 +17,7 @@
             --text-light: #6c757d;
             --success: #28a745;
             --danger: #dc3545;
+            --warning: #ffc107;
         }
         
         * {
@@ -37,7 +40,7 @@
         header {
             text-align: center;
             padding: 30px 0;
-            max-width: 800px;
+            max-width: 1000px;
             width: 100%;
         }
         
@@ -72,7 +75,7 @@
             border-radius: 20px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
             padding: 30px;
-            max-width: 800px;
+            max-width: 1000px;
             width: 100%;
             margin-bottom: 30px;
             position: relative;
@@ -252,22 +255,46 @@
             margin-top: 30px;
         }
         
-        .response-btn {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 12px 30px;
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            padding: 12px 25px;
             font-size: 1.1rem;
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
-            margin: 0 10px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
-        .response-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(40, 167, 69, 0.3);
+        .keep-btn {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .forget-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .reveal-btn {
+            background-color: var(--warning);
+            color: #333;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
         }
         
         .premium-badge {
@@ -285,7 +312,7 @@
             text-align: center;
             padding: 30px 0;
             color: var(--text-light);
-            max-width: 800px;
+            max-width: 1000px;
             width: 100%;
         }
         
@@ -403,6 +430,83 @@
             color: white;
         }
         
+        /* Styles pour les secrets divulgués */
+        .revealed-secrets-container {
+            margin-top: 40px;
+        }
+        
+        .revealed-secret {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border-left: 5px solid var(--warning);
+        }
+        
+        .revealed-secret-content {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        .revealed-secret-stats {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .donate-again-btn {
+            background: linear-gradient(135deg, var(--coral), var(--lavender));
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .donate-again-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(147, 112, 219, 0.3);
+        }
+        
+        .paypal-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .no-secrets {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+        
+        .secret-emotion {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.2rem;
@@ -426,6 +530,15 @@
             .step-card {
                 width: 100%;
                 max-width: 400px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-btn {
+                width: 100%;
             }
         }
     </style>
@@ -466,16 +579,33 @@
             <p>Recherche d'un secret similaire...</p>
         </div>
         
+        <div class="error-message" id="errorMessage"></div>
+        
         <div class="result-container" id="resultContainer">
             <h2>Voici un secret similaire au vôtre :</h2>
             <div class="secret-result" id="secretResult">
                 Chargement de votre secret...
             </div>
+            <div class="secret-emotion" id="secretEmotion"></div>
             
             <div class="response-section">
-                <p>Envie de soutenir cette personne anonymement ?</p>
-                <button class="response-btn" id="freeResponse">Envoyer un message gratuit</button>
-                <button class="response-btn" id="premiumResponse">Envoyer un GIF animé <span class="premium-badge">1€</span></button>
+                <p>Que souhaitez-vous faire avec ce secret ?</p>
+                <div class="action-buttons">
+                    <button class="action-btn keep-btn" id="keepBtn">
+                        <span>Garder</span> <span>🤫</span>
+                    </button>
+                    <button class="action-btn forget-btn" id="forgetBtn">
+                        <span>Oublier</span> <span>🙈</span>
+                    </button>
+                    <button class="action-btn reveal-btn" id="revealBtn">
+                        <span>Divulguer</span> <span>💰</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="paypal-container" id="paypalContainer">
+                <p>En divulguant ce secret, vous soutenez notre plateforme. Merci !</p>
+                <div id="paypal-button-container"></div>
             </div>
         </div>
     </div>
@@ -502,10 +632,10 @@
                 <p>Envoyez un message de soutien ou un GIF réconfortant.</p>
             </div>
             <div class="step-card">
-                <div class="step-icon">🦊</div>
+                <div class="step-icon">💎</div>
                 <div class="step-number">4</div>
-                <h3>Libérez-vous</h3>
-                <p>Partagez ce que vous ne pouvez dire à personne d'autre.</p>
+                <h3>Divulguez des secrets</h3>
+                <p>Soutenez la plateforme en divulguant des secrets contre un don.</p>
             </div>
         </div>
     </div>
@@ -531,6 +661,15 @@
         </div>
     </div>
     
+    <div class="container revealed-secrets-container">
+        <h2>Secrets divulgués</h2>
+        <p>Ces secrets ont été généreusement divulgués par notre communauté :</p>
+        
+        <div id="revealedSecretsList" class="no-secrets">
+            Chargement des secrets divulgués...
+        </div>
+    </div>
+    
     <footer>
         <p>© 2025 SecretSwap.fun - Tous droits réservés</p>
         <p>Un espace anonyme et bienveillant pour partager ce qui vous pèse</p>
@@ -538,8 +677,8 @@
     </footer>
 
     <script>
-        // Configuration - À MODIFIER AVEC VOS INFORMATIONS
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwA_oyGjr7lMbyGUW4FIGeNUDgKd2eQaLMHXe9L5sJ0-NGX6zIMmHbV_GnmZMGMHsGp/exec";
+        // Configuration
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxIHzKseDNNYykodGyFWii8ZH5XvoaUJ5LQ3qnnArwWH1aqZ9Sa8itlyX8_3aB5AO2/exec";
         
         // Éléments du DOM
         const secretInput = document.getElementById('secretInput');
@@ -549,10 +688,24 @@
         const loading = document.getElementById('loading');
         const resultContainer = document.getElementById('resultContainer');
         const secretResult = document.getElementById('secretResult');
-        const freeResponseBtn = document.getElementById('freeResponse');
-        const premiumResponseBtn = document.getElementById('premiumResponse');
+        const secretEmotion = document.getElementById('secretEmotion');
+        const revealBtn = document.getElementById('revealBtn');
+        const keepBtn = document.getElementById('keepBtn');
+        const forgetBtn = document.getElementById('forgetBtn');
+        const paypalContainer = document.getElementById('paypalContainer');
+        const paypalButtonContainer = document.getElementById('paypal-button-container');
+        const revealedSecretsList = document.getElementById('revealedSecretsList');
+        const errorMessage = document.getElementById('errorMessage');
         
+        // Variables d'état
         let selectedEmotion = null;
+        let currentSecretId = null;
+        let currentSecretEmotion = null;
+        
+        // Initialisation - Charger les secrets divulgués
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRevealedSecrets();
+        });
         
         // Mise à jour du compteur de caractères
         secretInput.addEventListener('input', () => {
@@ -591,33 +744,38 @@
             // Afficher l'indicateur de chargement
             loading.style.display = 'block';
             submitBtn.disabled = true;
+            errorMessage.style.display = 'none';
             
             try {
                 // Envoyer les données à Google Sheets
                 const response = await fetch(
-                    `${SCRIPT_URL}?secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`
+                    `${SCRIPT_URL}?action=submitSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`
                 );
                 
                 if (response.ok) {
-                    // Simuler un délai pour la recherche d'un secret similaire
-                    setTimeout(() => {
+                    // Récupérer un secret aléatoire de la même émotion
+                    const secretResponse = await fetch(
+                        `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`
+                    );
+                    
+                    if (secretResponse.ok) {
+                        const secretData = await secretResponse.json();
+                        
+                        if (secretData.error) {
+                            throw new Error(secretData.error);
+                        }
+                        
                         // Cacher le chargement
                         loading.style.display = 'none';
                         
-                        // Afficher un secret aléatoire (simulation)
-                        const sampleSecrets = [
-                            "Je fais semblant d'être heureux tous les jours alors que je suis déprimé.",
-                            "J'ai triché lors de mon dernier examen important.",
-                            "Je regrette mon choix de carrière mais j'ai peur de tout changer maintenant.",
-                            "Je suis secrètement amoureux de mon meilleur ami.",
-                            "Je cache une dette importante à ma famille."
-                        ];
-                        
-                        const randomSecret = sampleSecrets[Math.floor(Math.random() * sampleSecrets.length)];
-                        secretResult.textContent = randomSecret;
+                        secretResult.textContent = secretData.secret;
+                        secretEmotion.textContent = secretData.emotion;
+                        currentSecretId = secretData.id;
+                        currentSecretEmotion = secretData.emotion;
                         
                         // Afficher le résultat
                         resultContainer.style.display = 'block';
+                        paypalContainer.style.display = 'none';
                         
                         // Réinitialiser le formulaire
                         secretInput.value = '';
@@ -628,25 +786,214 @@
                         
                         // Faire défiler jusqu'au résultat
                         resultContainer.scrollIntoView({ behavior: 'smooth' });
-                    }, 2000);
+                    } else {
+                        throw new Error('Erreur lors de la récupération du secret');
+                    }
                 } else {
                     throw new Error('Erreur lors de la sauvegarde');
                 }
             } catch (error) {
                 loading.style.display = 'none';
                 submitBtn.disabled = false;
-                alert("Une erreur est survenue : " + error.message);
+                showError("Une erreur est survenue : " + error.message);
             }
         });
         
-        // Gestion des réponses
-        freeResponseBtn.addEventListener('click', () => {
-            alert("Votre message de soutien a été envoyé ! Merci pour votre bienveillance ❤️");
+        // Bouton pour garder le secret (like)
+        keepBtn.addEventListener('click', async () => {
+            try {
+                if (!currentSecretId) return;
+                
+                const response = await fetch(
+                    `${SCRIPT_URL}?action=recordReaction&secretId=${currentSecretId}&reactionType=keep`
+                );
+                
+                if (response.ok) {
+                    alert("Ce secret a été gardé. Merci pour votre discrétion 🤫");
+                    resultContainer.style.display = 'none';
+                } else {
+                    throw new Error('Erreur lors de lenregistrement');
+                }
+            } catch (error) {
+                showError("Erreur : " + error.message);
+            }
         });
         
-        premiumResponseBtn.addEventListener('click', () => {
-            alert("Fonctionnalité premium à venir ! Bientôt, vous pourrez envoyer des GIF réconfortants pour 1€.");
+        // Bouton pour oublier le secret (dislike)
+        forgetBtn.addEventListener('click', async () => {
+            try {
+                if (!currentSecretId) return;
+                
+                const response = await fetch(
+                    `${SCRIPT_URL}?action=recordReaction&secretId=${currentSecretId}&reactionType=forget`
+                );
+                
+                if (response.ok) {
+                    alert("Ce secret a été oublié. Il disparaît à jamais 🙈");
+                    resultContainer.style.display = 'none';
+                } else {
+                    throw new Error('Erreur lors de lenregistrement');
+                }
+            } catch (error) {
+                showError("Erreur : " + error.message);
+            }
         });
+        
+        // Bouton pour divulguer le secret
+        revealBtn.addEventListener('click', () => {
+            if (!currentSecretId) {
+                showError("Ce secret ne peut pas être divulgué.");
+                return;
+            }
+            
+            // Afficher le conteneur PayPal
+            paypalContainer.style.display = 'block';
+            paypalButtonContainer.innerHTML = '';
+            
+            // Initialiser le bouton PayPal
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '1.00' // 1€
+                            }
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(async function(details) {
+                        try {
+                            // Enregistrer le paiement dans Google Sheets
+                            const response = await fetch(
+                                `${SCRIPT_URL}?action=revealSecret&secretId=${currentSecretId}&paymentId=${details.id}&amount=1.00`
+                            );
+                            
+                            if (response.ok) {
+                                alert('Paiement réussi ! Merci pour votre soutien. Ce secret est maintenant divulgué.');
+                                
+                                // Mettre à jour la liste des secrets divulgués
+                                await loadRevealedSecrets();
+                                
+                                // Réinitialiser la section
+                                paypalContainer.style.display = 'none';
+                                resultContainer.style.display = 'none';
+                            } else {
+                                throw new Error('Erreur lors de lenregistrement du paiement');
+                            }
+                        } catch (error) {
+                            showError("Erreur : " + error.message);
+                        }
+                    });
+                },
+                onError: function(err) {
+                    console.error('Erreur PayPal:', err);
+                    showError('Une erreur est survenue lors du paiement. Veuillez réessayer.');
+                }
+            }).render('#paypal-button-container');
+        });
+        
+        // Fonction pour charger les secrets divulgués
+        async function loadRevealedSecrets() {
+            try {
+                revealedSecretsList.innerHTML = '<p>Chargement des secrets divulgués...</p>';
+                
+                const response = await fetch(`${SCRIPT_URL}?action=getRevealedSecrets`);
+                
+                if (response.ok) {
+                    const secrets = await response.json();
+                    
+                    if (secrets.length === 0) {
+                        revealedSecretsList.innerHTML = '<p>Aucun secret divulgué pour le moment. Soyez le premier !</p>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    secrets.forEach(secret => {
+                        html += `
+                            <div class="revealed-secret">
+                                <div class="revealed-secret-content">"${secret.secret}"</div>
+                                <div class="secret-emotion">${secret.emotion}</div>
+                                <div class="revealed-secret-stats">
+                                    <span>Divulgé ${secret.revealCount} fois</span>
+                                    <span>Total: ${secret.totalAmount.toFixed(2)}€</span>
+                                </div>
+                                <button class="donate-again-btn" data-secret-id="${secret.id}">
+                                    Soutenir à nouveau (1€)
+                                </button>
+                            </div>
+                        `;
+                    });
+                    
+                    revealedSecretsList.innerHTML = html;
+                    
+                    // Ajouter les événements aux boutons "Soutenir à nouveau"
+                    document.querySelectorAll('.donate-again-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const secretId = this.getAttribute('data-secret-id');
+                            initiateDonation(secretId);
+                        });
+                    });
+                } else {
+                    throw new Error('Erreur lors du chargement des secrets');
+                }
+            } catch (error) {
+                revealedSecretsList.innerHTML = `<p class="error">Erreur: ${error.message}</p>`;
+            }
+        }
+        
+        // Fonction pour initier un don pour un secret déjà divulgué
+        function initiateDonation(secretId) {
+            // Afficher le conteneur PayPal
+            paypalContainer.style.display = 'block';
+            paypalButtonContainer.innerHTML = '';
+            
+            // Initialiser le bouton PayPal
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '1.00' // 1€
+                            }
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(async function(details) {
+                        try {
+                            // Enregistrer le paiement dans Google Sheets
+                            const response = await fetch(
+                                `${SCRIPT_URL}?action=revealSecret&secretId=${secretId}&paymentId=${details.id}&amount=1.00`
+                            );
+                            
+                            if (response.ok) {
+                                alert('Merci pour votre don supplémentaire !');
+                                await loadRevealedSecrets();
+                                paypalContainer.style.display = 'none';
+                            } else {
+                                throw new Error('Erreur lors de lenregistrement du paiement');
+                            }
+                        } catch (error) {
+                            showError("Erreur : " + error.message);
+                        }
+                    });
+                },
+                onError: function(err) {
+                    console.error('Erreur PayPal:', err);
+                    showError('Une erreur est survenue lors du paiement. Veuillez réessayer.');
+                }
+            }).render('#paypal-button-container');
+            
+            // Faire défiler jusqu'au bouton PayPal
+            paypalContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Fonction pour afficher les erreurs
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
         
         // Animation d'entrée
         setTimeout(() => {
