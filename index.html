@@ -147,73 +147,63 @@
         <p><a href="#" style="color: var(--teal); text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: var(--teal); text-decoration: none;">Terms of Use</a></p>
     </footer>
 
+    <div class="confirmation" id="confirmation">
+        <h3>Are you sure?</h3>
+        <p id="confirmationMessage">This action cannot be undone.</p>
+        <div>
+            <button class="confirmation-btn confirmation-confirm" id="confirmAction">Confirm</button>
+            <button class="confirmation-btn confirmation-cancel" id="cancelAction">Cancel</button>
+        </div>
+    </div>
+
     <script>
         // Configuration
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysek7Ktw3bVSnOHVYzLBaRDXpqwhDuRYttsC3SCoLN0XTPkCdVfktooi6gRlk5lvQt/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4qboRa7ktq2pYBqyHZ5iE6xpV6QzdvH9TBPZDcdxjmNRGxlXyw2DjcGOAHpRNxM6i/exec";
         
-        // Fonction pour gérer les requêtes avec réessai
-        async function fetchWithRetry(url, options = {}, retries = 3) {
-            try {
-                const response = await fetch(url, options);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return response.json();
-            } catch (error) {
-                if (retries > 0) {
-                    console.log(`Retrying... (${retries} attempts left)`);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    return fetchWithRetry(url, options, retries - 1);
-                }
-                throw error;
-            }
+        // DOM elements
+        const secretInput = document.getElementById('secretInput');
+        const charCount = document.getElementById('charCount');
+        const emotionBtns = document.querySelectorAll('.emotion-btn');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultContainer = document.getElementById('resultContainer');
+        const secretResult = document.getElementById('secretResult');
+        const secretEmotion = document.getElementById('secretEmotion');
+        const revealBtn = document.getElementById('revealBtn');
+        const keepBtn = document.getElementById('keepBtn');
+        const forgetBtn = document.getElementById('forgetBtn');
+        const revealedSecretsList = document.getElementById('revealedSecretsList');
+        const errorMessage = document.getElementById('errorMessage');
+        const totalSecrets = document.getElementById('totalSecrets');
+        const paypalContainer = document.getElementById('paypalContainer');
+        const confirmation = document.getElementById('confirmation');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const confirmAction = document.getElementById('confirmAction');
+        const cancelAction = document.getElementById('cancelAction');
+        
+        // State variables
+        let selectedEmotion = null;
+        let currentSecretId = null;
+        let currentSecretEmotion = null;
+        let currentAction = null;
+        
+        // Initialize PayPal button
+        function initPayPalButton() {
+            paypal.HostedButtons({
+                hostedButtonId: "MJ85LP7VFBJQE"
+            }).render("#paypal-container-MJ85LP7VFBJQE");
         }
-
+        
+        // Initialization
         document.addEventListener('DOMContentLoaded', () => {
-            // DOM elements
-            const secretInput = document.getElementById('secretInput');
-            const charCount = document.getElementById('charCount');
-            const emotionBtns = document.querySelectorAll('.emotion-btn');
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const resultContainer = document.getElementById('resultContainer');
-            const secretResult = document.getElementById('secretResult');
-            const secretEmotion = document.getElementById('secretEmotion');
-            const revealBtn = document.getElementById('revealBtn');
-            const keepBtn = document.getElementById('keepBtn');
-            const forgetBtn = document.getElementById('forgetBtn');
-            const revealedSecretsList = document.getElementById('revealedSecretsList');
-            const errorMessage = document.getElementById('errorMessage');
-            const totalSecrets = document.getElementById('totalSecrets');
-            const paypalContainer = document.getElementById('paypalContainer');
-            
-            // State variables
-            let selectedEmotion = null;
-            let currentSecretId = null;
-            let currentSecretEmotion = null;
-            
-            // Initialize PayPal button
-            function initPayPalButton() {
-                paypal.HostedButtons({
-                    hostedButtonId: "MJ85LP7VFBJQE"
-                }).render("#paypal-container-MJ85LP7VFBJQE");
-            }
-            
-            // Initialization
             initPayPalButton();
             loadRevealedSecrets();
             updateSecretCounter();
             paypalContainer.style.display = 'none';
+            confirmation.style.display = 'none';
             
             // Update character counter
-            secretInput.addEventListener('input', () => {
-                const text = secretInput.value;
-                charCount.textContent = text.length;
-                
-                if (text.length > 0 && text.length <= 200 && selectedEmotion) {
-                    submitBtn.disabled = false;
-                } else {
-                    submitBtn.disabled = true;
-                }
-            });
+            secretInput.addEventListener('input', updateCharCount);
             
             // Emotion selection
             emotionBtns.forEach(btn => {
@@ -221,221 +211,302 @@
                     emotionBtns.forEach(b => b.classList.remove('selected'));
                     btn.classList.add('selected');
                     selectedEmotion = btn.dataset.emotion;
-                    
-                    if (secretInput.value.length > 0 && secretInput.value.length <= 200) {
-                        submitBtn.disabled = false;
-                    }
+                    validateForm();
                 });
             });
             
             // Secret submission
-            submitBtn.addEventListener('click', async () => {
-                const secret = secretInput.value;
-                
-                if (!secret || !selectedEmotion) {
-                    showError("Please enter a secret and select an emotion");
-                    return;
-                }
-                
-                // Show loading indicator
-                loading.style.display = 'block';
-                submitBtn.disabled = true;
-                errorMessage.style.display = 'none';
-                
-                try {
-                    // Send data to Google Sheets
-                    await fetchWithRetry(
-                        `${SCRIPT_URL}?action=submitSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}&origin=${encodeURIComponent(window.location.origin)}`,
-                        { method: 'GET' }
-                    );
-                    
-                    // Get a random secret with the same emotion
-                    const secretData = await fetchWithRetry(
-                        `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}&origin=${encodeURIComponent(window.location.origin)}`,
-                        { method: 'GET' }
-                    );
-                    
-                    // Hide loading
-                    loading.style.display = 'none';
-                    
-                    secretResult.textContent = secretData.secret;
-                    secretEmotion.textContent = secretData.emotion;
-                    currentSecretId = secretData.id;
-                    currentSecretEmotion = secretData.emotion;
-                    
-                    // Show result
-                    resultContainer.style.display = 'block';
-                    paypalContainer.style.display = 'none';
-                    
-                    // Reset form
-                    secretInput.value = '';
-                    charCount.textContent = '0';
-                    emotionBtns.forEach(b => b.classList.remove('selected'));
-                    selectedEmotion = null;
-                    submitBtn.disabled = true;
-                    
-                    // Scroll to result
-                    resultContainer.scrollIntoView({ behavior: 'smooth' });
-                    
-                    // Update secret counter
-                    updateSecretCounter();
-                } catch (error) {
-                    loading.style.display = 'none';
-                    submitBtn.disabled = false;
-                    showError("An error occurred: " + error.message);
-                }
-            });
+            submitBtn.addEventListener('click', submitSecret);
             
             // Keep secret button
-            keepBtn.addEventListener('click', async () => {
-                try {
-                    if (!currentSecretId) return;
-                    
-                    await fetchWithRetry(
-                        `${SCRIPT_URL}?action=recordReaction&secretId=${currentSecretId}&reactionType=keep&origin=${encodeURIComponent(window.location.origin)}`,
-                        { method: 'GET' }
-                    );
-                    
-                    alert("This secret has been kept. Thank you for your discretion 🤫");
-                    resultContainer.style.display = 'none';
-                } catch (error) {
-                    showError("Error: " + error.message);
-                }
-            });
+            keepBtn.addEventListener('click', () => showConfirmation("keep", "Are you sure you want to keep this secret?"));
             
             // Forget secret button
-            forgetBtn.addEventListener('click', async () => {
-                try {
-                    if (!currentSecretId) return;
-                    
-                    await fetchWithRetry(
-                        `${SCRIPT_URL}?action=recordReaction&secretId=${currentSecretId}&reactionType=forget&origin=${encodeURIComponent(window.location.origin)}`,
-                        { method: 'GET' }
-                    );
-                    
-                    alert("This secret has been forgotten. It disappears forever 🙈");
-                    resultContainer.style.display = 'none';
-                } catch (error) {
-                    showError("Error: " + error.message);
-                }
-            });
+            forgetBtn.addEventListener('click', () => showConfirmation("forget", "Are you sure you want to forget this secret? It will be gone forever."));
             
             // Reveal secret button
-            revealBtn.addEventListener('click', () => {
-                if (!currentSecretId) {
-                    showError("This secret cannot be revealed.");
+            revealBtn.addEventListener('click', showPaypalContainer);
+            
+            // Confirmation actions
+            confirmAction.addEventListener('click', handleActionConfirmation);
+            cancelAction.addEventListener('click', hideConfirmation);
+        });
+        
+        // Update character count
+        function updateCharCount() {
+            const text = secretInput.value;
+            charCount.textContent = text.length;
+            validateForm();
+        }
+        
+        // Validate form
+        function validateForm() {
+            const isValid = secretInput.value.length > 0 && 
+                            secretInput.value.length <= 200 && 
+                            selectedEmotion;
+            submitBtn.disabled = !isValid;
+        }
+        
+        // Show confirmation dialog
+        function showConfirmation(action, message) {
+            currentAction = action;
+            confirmationMessage.textContent = message;
+            confirmation.style.display = 'block';
+        }
+        
+        // Hide confirmation dialog
+        function hideConfirmation() {
+            confirmation.style.display = 'none';
+            currentAction = null;
+        }
+        
+        // Show PayPal container
+        function showPaypalContainer() {
+            if (!currentSecretId) {
+                showError("This secret cannot be revealed.");
+                return;
+            }
+            paypalContainer.style.display = 'block';
+            paypalContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Handle action confirmation
+        function handleActionConfirmation() {
+            hideConfirmation();
+            
+            if (currentAction === 'keep') {
+                handleKeepAction();
+            } else if (currentAction === 'forget') {
+                handleForgetAction();
+            }
+        }
+        
+        // Handle keep action
+        async function handleKeepAction() {
+            try {
+                if (!currentSecretId) return;
+                
+                const response = await fetch(
+                    `${SCRIPT_URL}?action=recordReaction&secretId=${currentSecretId}&reactionType=keep`,
+                    { method: 'GET' }
+                );
+                
+                const result = await response.json();
+                if (result.error) throw new Error(result.error);
+                
+                resultContainer.style.display = 'none';
+                showSuccessMessage("This secret has been kept. Thank you for your discretion 🤫");
+            } catch (error) {
+                showError("Error: " + error.message);
+            }
+        }
+        
+        // Handle forget action
+        async function handleForgetAction() {
+            try {
+                if (!currentSecretId) return;
+                
+                const response = await fetch(
+                    `${SCRIPT_URL}?action=recordReaction&secretId=${currentSecretId}&reactionType=forget`,
+                    { method: 'GET' }
+                );
+                
+                const result = await response.json();
+                if (result.error) throw new Error(result.error);
+                
+                resultContainer.style.display = 'none';
+                showSuccessMessage("This secret has been forgotten. It disappears forever 🙈");
+            } catch (error) {
+                showError("Error: " + error.message);
+            }
+        }
+        
+        // Function to submit secret
+        async function submitSecret() {
+            const secret = secretInput.value;
+            
+            if (!secret || !selectedEmotion) {
+                showError("Please enter a secret and select an emotion");
+                return;
+            }
+            
+            // Show loading indicator
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+            errorMessage.style.display = 'none';
+            
+            try {
+                // Send data to Google Sheets
+                const response = await fetch(
+                    `${SCRIPT_URL}?action=submitSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`,
+                    { method: 'GET' }
+                );
+                
+                const result = await response.json();
+                if (result.error) throw new Error(result.error);
+                
+                // Get a random secret with the same emotion
+                const secretResponse = await fetch(
+                    `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`,
+                    { method: 'GET' }
+                );
+                
+                const secretData = await secretResponse.json();
+                if (secretData.error) throw new Error(secretData.error);
+                
+                // Hide loading
+                loading.style.display = 'none';
+                
+                secretResult.textContent = secretData.secret;
+                secretEmotion.textContent = secretData.emotion;
+                currentSecretId = secretData.id;
+                currentSecretEmotion = secretData.emotion;
+                
+                // Show result
+                resultContainer.style.display = 'block';
+                paypalContainer.style.display = 'none';
+                
+                // Reset form
+                secretInput.value = '';
+                charCount.textContent = '0';
+                emotionBtns.forEach(b => b.classList.remove('selected'));
+                selectedEmotion = null;
+                submitBtn.disabled = true;
+                
+                // Scroll to result
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+                
+                // Update secret counter
+                updateSecretCounter();
+            } catch (error) {
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                showError("An error occurred: " + error.message);
+                console.error("Submission error:", error);
+            }
+        }
+        
+        // Function to load revealed secrets
+        async function loadRevealedSecrets() {
+            try {
+                const response = await fetch(
+                    `${SCRIPT_URL}?action=getRevealedSecrets`,
+                    { method: 'GET' }
+                );
+                
+                const secrets = await response.json();
+                
+                if (!Array.isArray(secrets)) {
+                    throw new Error('Invalid response format');
+                }
+                
+                if (secrets.length === 0) {
+                    revealedSecretsList.innerHTML = `
+                        <div class="no-secrets">
+                            <i class="fas fa-lock-open"></i>
+                            <p>No secrets revealed yet. Be the first to reveal one!</p>
+                        </div>
+                    `;
                     return;
                 }
                 
-                // Show PayPal container
-                paypalContainer.style.display = 'block';
-                paypalContainer.scrollIntoView({ behavior: 'smooth' });
-            });
-            
-            // Function to load revealed secrets
-            async function loadRevealedSecrets() {
-                try {
-                    revealedSecretsList.innerHTML = '<p>Loading revealed secrets...</p>';
-                    
-                    const secrets = await fetchWithRetry(
-                        `${SCRIPT_URL}?action=getRevealedSecrets&origin=${encodeURIComponent(window.location.origin)}`,
-                        { method: 'GET' }
-                    );
-                    
-                    if (!Array.isArray(secrets)) {
-                        throw new Error('Invalid response format');
-                    }
-                    
-                    if (secrets.length === 0) {
-                        revealedSecretsList.innerHTML = `
-                            <div class="no-secrets">
-                                <i class="fas fa-lock-open"></i>
-                                <p>No secrets revealed yet. Be the first to reveal one!</p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    let html = '';
-                    secrets.forEach(secret => {
-                        html += `
-                            <div class="revealed-secret">
-                                <div class="revealed-secret-content">"${secret.secret}"</div>
-                                <div class="secret-emotion">${secret.emotion}</div>
-                                <div class="revealed-secret-stats">
-                                    <div class="stat-item keep-stat">
-                                        <i class="fas fa-lock"></i> ${secret.keepCount} kept
-                                    </div>
-                                    <div class="stat-item forget-stat">
-                                        <i class="fas fa-eye-slash"></i> ${secret.forgetCount} forgot
-                                    </div>
-                                    <div class="stat-item reveal-stat">
-                                        <i class="fas fa-euro-sign"></i> ${secret.totalAmount.toFixed(2)}
-                                    </div>
+                let html = '';
+                secrets.forEach(secret => {
+                    html += `
+                        <div class="revealed-secret">
+                            <div class="revealed-secret-content">"${secret.secret}"</div>
+                            <div class="secret-emotion">${secret.emotion}</div>
+                            <div class="revealed-secret-stats">
+                                <div class="stat-item keep-stat">
+                                    <i class="fas fa-lock"></i> ${secret.keepCount} kept
                                 </div>
-                                <button class="donate-again-btn" data-secret-id="${secret.id}">
-                                    <i class="fas fa-gift"></i> Support Again (€1)
-                                </button>
+                                <div class="stat-item forget-stat">
+                                    <i class="fas fa-eye-slash"></i> ${secret.forgetCount} forgot
+                                </div>
+                                <div class="stat-item reveal-stat">
+                                    <i class="fas fa-euro-sign"></i> ${secret.totalAmount.toFixed(2)}
+                                </div>
                             </div>
-                        `;
+                            <button class="donate-again-btn" data-secret-id="${secret.id}">
+                                <i class="fas fa-gift"></i> Support Again (€1)
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                revealedSecretsList.innerHTML = html;
+                
+                // Add events to "Support Again" buttons
+                document.querySelectorAll('.donate-again-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const secretId = this.getAttribute('data-secret-id');
+                        currentSecretId = secretId;
+                        paypalContainer.style.display = 'block';
+                        paypalContainer.scrollIntoView({ behavior: 'smooth' });
                     });
-                    
-                    revealedSecretsList.innerHTML = html;
-                    
-                    // Add events to "Support Again" buttons
-                    document.querySelectorAll('.donate-again-btn').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const secretId = this.getAttribute('data-secret-id');
-                            currentSecretId = secretId;
-                            paypalContainer.style.display = 'block';
-                            paypalContainer.scrollIntoView({ behavior: 'smooth' });
-                        });
-                    });
-                } catch (error) {
-                    revealedSecretsList.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
-                }
+                });
+            } catch (error) {
+                revealedSecretsList.innerHTML = `<div class="error-message">Error loading secrets: ${error.message}</div>`;
             }
-            
-            // Function to get total secrets count
-            async function getTotalSecretsCount() {
-                try {
-                    const data = await fetchWithRetry(
-                        `${SCRIPT_URL}?action=getTotalSecretsCount&origin=${encodeURIComponent(window.location.origin)}`,
-                        { method: 'GET' }
-                    );
-                    return data.count || 0;
-                } catch (error) {
-                    return 0;
-                }
+        }
+        
+        // Function to get total secrets count
+        async function getTotalSecretsCount() {
+            try {
+                const response = await fetch(
+                    `${SCRIPT_URL}?action=getTotalSecretsCount`,
+                    { method: 'GET' }
+                );
+                const data = await response.json();
+                return data.count || 0;
+            } catch (error) {
+                return 0;
             }
-            
-            // Update secret counter with real data
-            async function updateSecretCounter() {
-                try {
-                    const count = await getTotalSecretsCount();
-                    totalSecrets.textContent = count.toLocaleString();
-                } catch (error) {
-                    console.error("Failed to update secret counter:", error);
-                }
+        }
+        
+        // Update secret counter with real data
+        async function updateSecretCounter() {
+            try {
+                const count = await getTotalSecretsCount();
+                totalSecrets.textContent = count.toLocaleString();
+            } catch (error) {
+                console.error("Failed to update secret counter:", error);
             }
-            
-            // Function to show errors
-            function showError(message) {
-                errorMessage.textContent = message;
-                errorMessage.style.display = 'block';
-                setTimeout(() => {
-                    errorMessage.style.display = 'none';
-                }, 5000);
-            }
-            
-            // Initial fade-in animation
-            document.body.style.opacity = '0';
+        }
+        
+        // Function to show errors
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
             setTimeout(() => {
-                document.body.style.transition = 'opacity 0.8s ease';
-                document.body.style.opacity = '1';
-                updateSecretCounter();
-            }, 100);
-        });
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Function to show success message
+        function showSuccessMessage(message) {
+            const successMessage = document.createElement('div');
+            successMessage.className = 'error-message';
+            successMessage.style.backgroundColor = 'rgba(6, 214, 160, 0.2)';
+            successMessage.style.borderLeftColor = 'var(--success)';
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            
+            document.body.appendChild(successMessage);
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+                document.body.removeChild(successMessage);
+            }, 5000);
+        }
+        
+        // Initial fade-in animation
+        document.body.style.opacity = '0';
+        setTimeout(() => {
+            document.body.style.transition = 'opacity 0.8s ease';
+            document.body.style.opacity = '1';
+            updateSecretCounter();
+        }, 100);
     </script>
 </body>
 </html>
