@@ -5,7 +5,542 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecretSwap.fun - Exchange Secrets Anonymously</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --dark-blue: #0f3460;
+            --teal: #06d6a0;
+            --pink: #e94560;
+            --light: #f1faee;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark-blue));
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .secret-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        header {
+            text-align: center;
+            margin: 40px 0 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            font-size: 48px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(to right, var(--teal), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        .fun {
+            color: var(--pink);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto 60px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--teal);
+            color: var(--darker);
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .secret-input {
+            width: 100%;
+            height: 150px;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 16px;
+            resize: none;
+            transition: all 0.3s;
+        }
+
+        .secret-input:focus {
+            outline: none;
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(6, 214, 160, 0.3);
+        }
+
+        .char-count {
+            text-align: right;
+            margin-top: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .emotion-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .emotion-btn {
+            font-size: 2.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        .emotion-btn:hover {
+            transform: scale(1.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .emotion-btn.selected {
+            transform: scale(1.2);
+            background: var(--teal);
+            color: var(--darker);
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(to right, var(--teal), var(--pink));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 30px 0;
+        }
+
+        .submit-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .submit-btn:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(233, 69, 96, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 0;
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--teal);
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(239, 71, 111, 0.2);
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .result-container {
+            display: none;
+        }
+
+        .secret-result {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin: 20px 0;
+            border-left: 4px solid var(--teal);
+        }
+
+        .secret-emotion {
+            font-size: 3rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .response-section {
+            margin: 40px 0 20px;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .keep-btn {
+            background: rgba(6, 214, 160, 0.2);
+            color: var(--teal);
+        }
+
+        .forget-btn {
+            background: rgba(255, 209, 102, 0.2);
+            color: var(--warning);
+        }
+
+        .reveal-btn {
+            background: rgba(239, 71, 111, 0.2);
+            color: var(--pink);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .paypal-container {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .how-it-works {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            justify-content: center;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: var(--teal);
+            color: var(--darker);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--teal);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--teal);
+        }
+
+        .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .revealed-secrets-container {
+            margin-top: 60px;
+        }
+
+        .revealed-secret {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid var(--pink);
+        }
+
+        .revealed-secret-content {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .revealed-secret-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .donate-again-btn {
+            background: rgba(233, 69, 96, 0.2);
+            color: var(--pink);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .donate-again-btn:hover {
+            background: rgba(233, 69, 96, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .no-secrets {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .no-secrets i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+            color: rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer a {
+            color: var(--teal);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .confirmation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--darker);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            display: none;
+            border: 2px solid var(--teal);
+        }
+
+        .confirmation h3 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: var(--teal);
+        }
+
+        .confirmation p {
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .confirmation-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .confirmation-confirm {
+            background: var(--teal);
+            color: var(--darker);
+            margin-right: 10px;
+        }
+
+        .confirmation-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .confirmation-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
     <script src="https://www.paypal.com/sdk/js?client-id=BAASqHmRUaw9JpJWNA3d0XElWNNDdRQdytHNxWDxEtZTz8gICMWyhyqiKfNtkbc4Q8-f2aYdN5VR_ailf8&components=hosted-buttons&disable-funding=venmo&currency=EUR"></script>
 </head>
 <body>
@@ -35,10 +570,10 @@
         <div class="step">
             <h2><span>2</span> Choose Your Emotion</h2>
             <div class="emotion-selector">
-                <button class="emotion-btn" data-emotion="😊">😊</button>
-                <button class="emotion-btn" data-emotion="😢">😢</button>
-                <button class="emotion-btn" data-emotion="😠">😠</button>
-                <button class="emotion-btn" data-emotion="😳">😳</button>
+                <button class="emotion-btn" data-emotion="happy">😊</button>
+                <button class="emotion-btn" data-emotion="sad">😢</button>
+                <button class="emotion-btn" data-emotion="angry">😠</button>
+                <button class="emotion-btn" data-emotion="shocked">😳</button>
             </div>
         </div>
         
@@ -158,7 +693,7 @@
 
     <script>
         // Configuration
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9kyCqL81sTuOpuMcx8fgm9Edb2AlsTX3HZtlGate30WpunvNr-ZBITdb3oCtJz_y-/exec";
+        const SCRIPT_URL = "VOTRE_URL_DEPLOIEhttps://script.google.com/macros/s/AKfycbxKNLPJ4JshggAyI_LxBniin7xy0dHXpUPdcx1i7iRcCzNTu9XkOm9Epoe6AhztVaE4/execMENT_APPS_SCRIPT"; // À REMPLACER
         
         // DOM elements
         const secretInput = document.getElementById('secretInput');
@@ -286,13 +821,20 @@
             try {
                 if (!currentSecretId) return;
                 
-                const response = await fetch(
-                    `${SCRIPT_URL}?action=recordReaction&secretId=${currentSecretId}&reactionType=keep`,
-                    { method: 'GET' }
-                );
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'recordReaction',
+                        secretId: currentSecretId,
+                        reactionType: 'keep'
+                    })
+                });
                 
-                const result = await response.json();
-                if (result.error) throw new Error(result.error);
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    throw new Error(errorResult.error || 'Error recording reaction');
+                }
                 
                 resultContainer.style.display = 'none';
                 showSuccessMessage("This secret has been kept. Thank you for your discretion 🤫");
@@ -306,13 +848,20 @@
             try {
                 if (!currentSecretId) return;
                 
-                const response = await fetch(
-                    `${SCRIPT_URL}?action=recordReaction&secretId=${currentSecretId}&reactionType=forget`,
-                    { method: 'GET' }
-                );
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'recordReaction',
+                        secretId: currentSecretId,
+                        reactionType: 'forget'
+                    })
+                });
                 
-                const result = await response.json();
-                if (result.error) throw new Error(result.error);
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    throw new Error(errorResult.error || 'Error recording reaction');
+                }
                 
                 resultContainer.style.display = 'none';
                 showSuccessMessage("This secret has been forgotten. It disappears forever 🙈");
@@ -337,22 +886,32 @@
             
             try {
                 // Send data to Google Sheets
-                const response = await fetch(
-                    `${SCRIPT_URL}?action=submitSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`,
-                    { method: 'GET' }
-                );
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'submitSecret',
+                        secret: secret,
+                        emotion: selectedEmotion
+                    })
+                });
                 
-                const result = await response.json();
-                if (result.error) throw new Error(result.error);
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    throw new Error(errorResult.error || 'Error submitting secret');
+                }
                 
                 // Get a random secret with the same emotion
-                const secretResponse = await fetch(
-                    `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`,
-                    { method: 'GET' }
-                );
+                const secretResponse = await fetch(SCRIPT_URL + '?action=getRandomSecret&emotion=' + encodeURIComponent(selectedEmotion), {
+                    method: 'GET'
+                });
+                
+                if (!secretResponse.ok) {
+                    const errorResult = await secretResponse.json();
+                    throw new Error(errorResult.error || 'Error getting random secret');
+                }
                 
                 const secretData = await secretResponse.json();
-                if (secretData.error) throw new Error(secretData.error);
                 
                 // Hide loading
                 loading.style.display = 'none';
@@ -389,10 +948,13 @@
         // Function to load revealed secrets
         async function loadRevealedSecrets() {
             try {
-                const response = await fetch(
-                    `${SCRIPT_URL}?action=getRevealedSecrets`,
-                    { method: 'GET' }
-                );
+                const response = await fetch(SCRIPT_URL + '?action=getRevealedSecrets', {
+                    method: 'GET'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load revealed secrets');
+                }
                 
                 const secrets = await response.json();
                 
@@ -424,7 +986,7 @@
                                     <i class="fas fa-eye-slash"></i> ${secret.forgetCount} forgot
                                 </div>
                                 <div class="stat-item reveal-stat">
-                                    <i class="fas fa-euro-sign"></i> ${secret.totalAmount.toFixed(2)}
+                                    <i class="fas fa-euro-sign"></i> €${secret.totalAmount.toFixed(2)}
                                 </div>
                             </div>
                             <button class="donate-again-btn" data-secret-id="${secret.id}">
@@ -453,10 +1015,9 @@
         // Function to get total secrets count
         async function getTotalSecretsCount() {
             try {
-                const response = await fetch(
-                    `${SCRIPT_URL}?action=getTotalSecretsCount`,
-                    { method: 'GET' }
-                );
+                const response = await fetch(SCRIPT_URL + '?action=getTotalSecretsCount', {
+                    method: 'GET'
+                });
                 const data = await response.json();
                 return data.count || 0;
             } catch (error) {
