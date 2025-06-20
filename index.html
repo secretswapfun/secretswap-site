@@ -887,9 +887,9 @@
 
     <script>
         // Configuration
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxE1ulxVovVHEY5i4bXkQh5Is7lE-n0e9hLiM3kMHjVNoS26ABO_ntv5Rh9ZQqeFlco/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyX9HU7NOdlLRFd5On9xcCZJj06uJ2zR3NQiK9Kh7iQvgUkz1CETFoROjkjsU3bRKXw/exec";
         
-               // DOM elements
+        // DOM elements
         const secretInput = document.getElementById('secretInput');
         const charCount = document.getElementById('charCount');
         const emotionBtns = document.querySelectorAll('.emotion-btn');
@@ -901,7 +901,6 @@
         const revealBtn = document.getElementById('revealBtn');
         const keepBtn = document.getElementById('keepBtn');
         const forgetBtn = document.getElementById('forgetBtn');
-        const paypalContainer = document.querySelector('.paypal-container');
         const revealedSecretsList = document.getElementById('revealedSecretsList');
         const errorMessage = document.getElementById('errorMessage');
         const totalSecrets = document.getElementById('totalSecrets');
@@ -966,8 +965,8 @@
                 );
                 
                 const result = await response.json();
-                if (!response.ok || result.error) {
-                    throw new Error(result.error || 'Failed to save secret');
+                if (result.error) {
+                    throw new Error(result.error);
                 }
                 
                 // Get a random secret with the same emotion
@@ -976,8 +975,8 @@
                 );
                 
                 const secretData = await secretResponse.json();
-                if (!secretResponse.ok || secretData.error) {
-                    throw new Error(secretData.error || 'Failed to get secret');
+                if (secretData.error) {
+                    throw new Error(secretData.error);
                 }
                 
                 // Hide loading
@@ -1021,8 +1020,8 @@
                 );
                 
                 const result = await response.json();
-                if (!response.ok || result.error) {
-                    throw new Error(result.error || 'Failed to record reaction');
+                if (result.error) {
+                    throw new Error(result.error);
                 }
                 
                 alert("This secret has been kept. Thank you for your discretion 🤫");
@@ -1042,8 +1041,8 @@
                 );
                 
                 const result = await response.json();
-                if (!response.ok || result.error) {
-                    throw new Error(result.error || 'Failed to record reaction');
+                if (result.error) {
+                    throw new Error(result.error);
                 }
                 
                 alert("This secret has been forgotten. It disappears forever 🙈");
@@ -1073,8 +1072,8 @@
                 const response = await fetch(`${SCRIPT_URL}?action=getRevealedSecrets`);
                 const secrets = await response.json();
                 
-                if (!response.ok || Array.isArray(secrets) === false) {
-                    throw new Error('Failed to load revealed secrets');
+                if (!Array.isArray(secrets)) {
+                    throw new Error('Invalid response format');
                 }
                 
                 if (secrets.length === 0) {
