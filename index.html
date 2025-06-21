@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecretSwap.fun - Échangez vos secrets anonymement</title>
+    <title>SecretSwap.fun - Exchange your secrets anonymously</title>
     <style>
         :root {
             --coral: #FF7F50;
@@ -166,6 +166,13 @@
             color: var(--text-light);
             font-size: 0.9rem;
             margin-bottom: 20px;
+        }
+        
+        .error-message {
+            color: var(--danger);
+            text-align: center;
+            margin: 10px 0;
+            display: none;
         }
         
         .emotion-selector {
@@ -335,6 +342,13 @@
             transform: translateY(1px);
         }
         
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
         .thank-you-message {
             text-align: center;
             margin-top: 20px;
@@ -345,58 +359,131 @@
             animation: fadeIn 0.5s ease;
         }
         
-        .premium-badge {
-            background: linear-gradient(135deg, #ffd700, #ffa500);
-            color: #333;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-left: 5px;
-            vertical-align: middle;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 30px 0;
-            color: var(--text-light);
-            max-width: 800px;
+        .revealed-secrets-container {
+            margin-top: 40px;
             width: 100%;
-            font-size: 0.9rem;
         }
         
-        .features {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+        .revealed-secrets-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: var(--dark-purple);
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .revealed-secrets-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--coral), var(--lavender));
+            border-radius: 2px;
+        }
+        
+        .secrets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
-            margin: 30px 0;
+            margin-top: 20px;
         }
         
-        .feature {
-            background: var(--card-bg);
+        .secret-card {
+            background: white;
             border-radius: 15px;
             padding: 20px;
-            width: 220px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            text-align: center;
+            position: relative;
             transition: transform 0.3s ease;
         }
         
-        .feature:hover {
+        .secret-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--lavender);
+        .secret-content {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            position: relative;
         }
         
-        .feature h3 {
-            margin-bottom: 10px;
-            color: var(--dark-purple);
+        .secret-content::before,
+        .secret-content::after {
+            content: '"';
+            font-size: 2rem;
+            position: absolute;
+            color: rgba(147, 112, 219, 0.2);
+            font-family: serif;
         }
+        
+        .secret-content::before {
+            top: 5px;
+            left: 10px;
+        }
+        
+        .secret-content::after {
+            bottom: -20px;
+            right: 10px;
+        }
+        
+        .secret-emotion {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: var(--lavender);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .keep-stat .stat-value { color: var(--success); }
+        .forget-stat .stat-value { color: var(--danger); }
+        .support-stat .stat-value { color: var(--info); }
+        .reveal-stat .stat-value { color: var(--warning); }
         
         .loading {
             display: none;
@@ -525,6 +612,10 @@
                 width: 100%;
                 max-width: 300px;
             }
+            
+            .secrets-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 480px) {
@@ -544,6 +635,10 @@
                 padding: 15px 30px;
                 font-size: 1.1rem;
             }
+            
+            .revealed-secrets-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -553,127 +648,142 @@
             <div class="logo-icon">🤫</div>
             <h1>SecretSwap<span class="fun">.fun</span></h1>
         </div>
-        <p class="tagline">Échangez vos secrets anonymement et recevez un secret en retour</p>
+        <p class="tagline">Share your secrets anonymously and get one in return</p>
     </header>
     
-    <div class="container">
+    <div class="container" id="secretFormContainer">
         <div class="step">
-            <h2><span>1</span> Partagez votre secret</h2>
+            <h2><span>1</span> Share your secret</h2>
             <textarea 
                 id="secretInput" 
                 class="secret-input" 
-                placeholder="Écrivez ici ce qui vous pèse... (max 200 caractères)"></textarea>
-            <div class="char-count"><span id="charCount">0</span>/200 caractères</div>
+                placeholder="Write what's on your mind... (min 100, max 500 characters)"></textarea>
+            <div class="char-count"><span id="charCount">0</span>/500 characters</div>
+            <div class="error-message" id="lengthError">Secret must be at least 100 characters long</div>
         </div>
         
         <div class="step">
-            <h2><span>2</span> Choisissez votre émotion</h2>
+            <h2><span>2</span> Choose your emotion</h2>
             <div class="emotion-selector">
                 <button class="emotion-btn" data-emotion="😊">😊</button>
                 <button class="emotion-btn" data-emotion="😢">😢</button>
                 <button class="emotion-btn" data-emotion="😠">😠</button>
                 <button class="emotion-btn" data-emotion="😳">😳</button>
             </div>
+            <div class="error-message" id="emotionError">Please select an emotion</div>
         </div>
         
-        <button id="submitBtn" class="submit-btn" disabled>Partager anonymement</button>
+        <button id="submitBtn" class="submit-btn" disabled>Share anonymously</button>
         
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Recherche d'un secret similaire...</p>
+            <p>Looking for a similar secret...</p>
         </div>
         
         <div class="result-container" id="resultContainer">
-            <h2 id="resultTitle">Voici un secret similaire au vôtre :</h2>
+            <h2 id="resultTitle">Here is a secret similar to yours:</h2>
             <div class="secret-result" id="secretResult">
-                Chargement de votre secret...
+                Loading your secret...
             </div>
             
             <div class="actions-container" id="actionsContainer">
-                <button class="action-btn keep-btn" data-action="keep">
-                    <span>📁</span> Garder
+                <button class="action-btn keep-btn" data-action="keep" disabled>
+                    <span>📁</span> Keep
                 </button>
-                <button class="action-btn forget-btn" data-action="forget">
-                    <span>🧹</span> Oublier
+                <button class="action-btn forget-btn" data-action="forget" disabled>
+                    <span>🧹</span> Forget
                 </button>
-                <button class="action-btn support-btn" data-action="support">
-                    <span>🤗</span> Soutenir
+                <button class="action-btn support-btn" data-action="support" disabled>
+                    <span>🤗</span> Support
                 </button>
-                <button class="action-btn reveal-btn" data-action="reveal">
-                    <span>📣</span> Révéler
+                <button class="action-btn reveal-btn" data-action="reveal" disabled>
+                    <span>📣</span> Reveal
                 </button>
             </div>
             
             <div class="thank-you-message" id="thankYouMessage">
-                Merci pour votre participation !
+                Thank you for participating!
             </div>
         </div>
     </div>
     
     <div class="how-it-works">
-        <h2>Comment ça fonctionne ?</h2>
+        <h2>How it works?</h2>
         <div class="steps">
             <div class="step-card">
                 <div class="step-icon">🔒</div>
                 <div class="step-number">1</div>
-                <h3>Partagez anonymement</h3>
-                <p>Écrivez votre secret et choisissez votre émotion actuelle.</p>
+                <h3>Share anonymously</h3>
+                <p>Write your secret and choose your current emotion.</p>
             </div>
             <div class="step-card">
                 <div class="step-icon">🔄</div>
                 <div class="step-number">2</div>
-                <h3>Recevez un secret</h3>
-                <p>Obtenez instantanément un secret d'une personne ressentant la même chose.</p>
+                <h3>Receive a secret</h3>
+                <p>Instantly get a secret from someone feeling the same.</p>
             </div>
             <div class="step-card">
                 <div class="step-icon">💌</div>
                 <div class="step-number">3</div>
-                <h3>Soutenez les autres</h3>
-                <p>Gardez, oubliez ou soutenez un secret.</p>
+                <h3>Support others</h3>
+                <p>Keep, forget, or support a secret.</p>
             </div>
             <div class="step-card">
                 <div class="step-icon">🦊</div>
                 <div class="step-number">4</div>
-                <h3>Libérez-le</h3>
-                <p>Partagez ce secret avec le monde entier !</p>
+                <h3>Release it</h3>
+                <p>Share this secret with the whole world!</p>
             </div>
         </div>
     </div>
     
     <div class="container">
-        <h2>Vos secrets sont en sécurité</h2>
+        <h2>Your secrets are safe</h2>
         <div class="features">
             <div class="feature">
                 <div class="feature-icon">🔐</div>
-                <h3>Anonymat total</h3>
-                <p>Aucune information personnelle n'est collectée ou stockée.</p>
+                <h3>Total anonymity</h3>
+                <p>No personal information is collected or stored.</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">🔄</div>
-                <h3>Échanges instantanés</h3>
-                <p>Recevez un secret similaire dès que vous partagez le vôtre.</p>
+                <h3>Instant exchanges</h3>
+                <p>Receive a similar secret as soon as you share yours.</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">💖</div>
-                <h3>Communauté bienveillante</h3>
-                <p>Un espace sans jugement pour se libérer.</p>
+                <h3>Caring community</h3>
+                <p>A judgment-free space to free yourself.</p>
             </div>
         </div>
     </div>
     
+    <div class="revealed-secrets-container">
+        <h2 class="revealed-secrets-title">Revealed Secrets</h2>
+        <div class="loading" id="revealedLoading">
+            <div class="spinner"></div>
+            <p>Loading revealed secrets...</p>
+        </div>
+        <div class="secrets-grid" id="revealedSecretsGrid">
+            <!-- Revealed secrets will be loaded here -->
+        </div>
+    </div>
+    
     <footer>
-        <p>© 2025 SecretSwap.fun - Tous droits réservés</p>
-        <p>Un espace anonyme et bienveillant pour partager ce qui vous pèse</p>
-        <p><a href="#" style="color: var(--lavender); text-decoration: none;">Politique de confidentialité</a> | <a href="#" style="color: var(--lavender); text-decoration: none;">Conditions d'utilisation</a></p>
+        <p>© 2025 SecretSwap.fun - All rights reserved</p>
+        <p>An anonymous and caring space to share what's on your mind</p>
+        <p><a href="#" style="color: var(--lavender); text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: var(--lavender); text-decoration: none;">Terms of Use</a></p>
     </footer>
 
     <script>
-        // Configuration - À MODIFIER AVEC VOS INFORMATIONS
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNMwjQCW5TzEQcyXV630wBm1iTrWLtDeC_OeQWQCPM9HJRVWpaOsXS-pIBipOjBLricA/exec";
+        // Configuration - TO UPDATE WITH YOUR INFORMATION
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOr3doKm0Np0mB2p669a1VdP092uFcQzBUHJOrfHAZhMgHVtC5j0oOh3cq_SY5XKe8Rw/exec";
         
-        // Éléments du DOM
+        // DOM Elements
         const secretInput = document.getElementById('secretInput');
         const charCount = document.getElementById('charCount');
+        const lengthError = document.getElementById('lengthError');
+        const emotionError = document.getElementById('emotionError');
         const emotionBtns = document.querySelectorAll('.emotion-btn');
         const submitBtn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
@@ -683,59 +793,85 @@
         const actionsContainer = document.getElementById('actionsContainer');
         const thankYouMessage = document.getElementById('thankYouMessage');
         const actionBtns = document.querySelectorAll('.action-btn');
+        const secretFormContainer = document.getElementById('secretFormContainer');
+        const revealedLoading = document.getElementById('revealedLoading');
+        const revealedSecretsGrid = document.getElementById('revealedSecretsGrid');
         
         let selectedEmotion = null;
         let currentRowId = null;
+        let actionTaken = false;
         
-        // Mise à jour du compteur de caractères
+        // Update character counter
         secretInput.addEventListener('input', () => {
             const text = secretInput.value;
             charCount.textContent = text.length;
             
-            // Activer/désactiver le bouton selon la longueur
-            if (text.length > 0 && text.length <= 200 && selectedEmotion) {
+            // Validate length
+            if (text.length < 100) {
+                lengthError.style.display = 'block';
+            } else {
+                lengthError.style.display = 'none';
+            }
+            
+            // Enable/disable submit button
+            updateSubmitButton();
+        });
+        
+        // Emotion selection
+        emotionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove previous selection
+                emotionBtns.forEach(b => b.classList.remove('selected'));
+                
+                // Select new emotion
+                btn.classList.add('selected');
+                selectedEmotion = btn.dataset.emotion;
+                emotionError.style.display = 'none';
+                
+                // Update submit button
+                updateSubmitButton();
+            });
+        });
+        
+        // Update submit button state
+        function updateSubmitButton() {
+            const text = secretInput.value;
+            if (text.length >= 100 && text.length <= 500 && selectedEmotion) {
                 submitBtn.disabled = false;
             } else {
                 submitBtn.disabled = true;
             }
-        });
+        }
         
-        // Sélection des émotions
-        emotionBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Retirer la sélection précédente
-                emotionBtns.forEach(b => b.classList.remove('selected'));
-                
-                // Sélectionner la nouvelle émotion
-                btn.classList.add('selected');
-                selectedEmotion = btn.dataset.emotion;
-                
-                // Activer le bouton si le texte est valide
-                if (secretInput.value.length > 0 && secretInput.value.length <= 200) {
-                    submitBtn.disabled = false;
-                }
-            });
-        });
-        
-        // Soumission du secret
+        // Submit secret
         submitBtn.addEventListener('click', async () => {
             const secret = secretInput.value;
             
-            // Afficher l'indicateur de chargement
+            // Validate inputs
+            if (secret.length < 100) {
+                lengthError.style.display = 'block';
+                return;
+            }
+            
+            if (!selectedEmotion) {
+                emotionError.style.display = 'block';
+                return;
+            }
+            
+            // Show loading indicator
             loading.style.display = 'block';
             submitBtn.disabled = true;
             resultContainer.style.display = 'none';
-            actionsContainer.style.display = 'flex';
             thankYouMessage.style.display = 'none';
             
             try {
-                // Envoyer les données à Google Sheets
+                // Send data to Google Sheets
                 const response = await fetch(
                     `${SCRIPT_URL}?action=addSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`
                 );
                 
                 if (response.ok) {
-                    // Maintenant, récupérer un secret aléatoire de la même émotion
+                    // Now get a random secret with the same emotion
                     const secretResponse = await fetch(
                         `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`
                     );
@@ -743,77 +879,174 @@
                     if (secretResponse.ok) {
                         const secretData = await secretResponse.json();
                         
-                        // Cacher le chargement
+                        // Hide loading
                         loading.style.display = 'none';
                         
                         if (secretData.status === "no_secret") {
-                            // Aucun secret trouvé pour cette émotion
-                            resultTitle.textContent = "Vous êtes le premier avec cette émotion !";
-                            secretResult.textContent = "Partagez votre secret pour démarrer l'échange. Dès qu'une autre personne partagera un secret similaire, vous le recevrez.";
+                            // No secret found for this emotion
+                            resultTitle.textContent = "You're the first with this emotion!";
+                            secretResult.textContent = "Share your secret to start the exchange. As soon as another person shares a similar secret, you'll receive it.";
                             actionsContainer.style.display = 'none';
                         } else {
-                            // Afficher le secret récupéré
+                            // Show the retrieved secret
                             secretResult.textContent = secretData.secret;
                             currentRowId = secretData.rowId;
-                            resultTitle.textContent = "Voici un secret similaire au vôtre :";
+                            resultTitle.textContent = "Here is a secret similar to yours:";
                             actionsContainer.style.display = 'flex';
+                            
+                            // Enable action buttons
+                            actionBtns.forEach(btn => btn.disabled = false);
                         }
                         
-                        // Afficher le résultat
+                        // Show result container
                         resultContainer.style.display = 'block';
                         
-                        // Réinitialiser le formulaire
+                        // Hide the form
+                        secretFormContainer.style.display = 'none';
+                        
+                        // Reset form
                         secretInput.value = '';
                         charCount.textContent = '0';
                         emotionBtns.forEach(b => b.classList.remove('selected'));
                         selectedEmotion = null;
                         submitBtn.disabled = true;
                         
-                        // Faire défiler jusqu'au résultat
+                        // Scroll to result
                         resultContainer.scrollIntoView({ behavior: 'smooth' });
+                        
+                        // Load revealed secrets
+                        loadRevealedSecrets();
                     } else {
-                        throw new Error('Erreur lors de la récupération du secret');
+                        throw new Error('Error retrieving secret');
                     }
                 } else {
-                    throw new Error('Erreur lors de la sauvegarde');
+                    throw new Error('Save error');
                 }
             } catch (error) {
                 loading.style.display = 'none';
                 submitBtn.disabled = false;
-                alert("Une erreur est survenue : " + error.message);
+                alert("An error occurred: " + error.message);
             }
         });
         
-        // Gestion des actions (Garder, Oublier, Soutenir, Révéler)
+        // Handle actions (Keep, Forget, Support, Reveal)
         actionBtns.forEach(btn => {
             btn.addEventListener('click', async () => {
+                if (actionTaken) return;
+                
                 const action = btn.dataset.action;
+                actionTaken = true;
+                
+                // Disable all action buttons
+                actionBtns.forEach(b => b.disabled = true);
                 
                 try {
-                    // Envoyer la requête pour incrémenter le compteur
+                    // Send request to increment counter
                     const response = await fetch(
                         `${SCRIPT_URL}?action=increment&rowId=${currentRowId}&counterType=${action}`
                     );
                     
                     if (response.ok) {
-                        // Cacher les boutons d'action et afficher le message de remerciement
+                        // Hide action buttons and show thank you message
                         actionsContainer.style.display = 'none';
                         thankYouMessage.style.display = 'block';
                         
-                        // Masquer le message après 3 secondes
+                        // Hide message after 3 seconds
                         setTimeout(() => {
                             thankYouMessage.style.display = 'none';
                         }, 3000);
+                        
+                        // If action is reveal, reload revealed secrets
+                        if (action === 'reveal') {
+                            loadRevealedSecrets();
+                        }
                     } else {
-                        throw new Error('Erreur lors de la mise à jour');
+                        throw new Error('Update error');
                     }
                 } catch (error) {
-                    alert("Erreur : " + error.message);
+                    alert("Error: " + error.message);
+                    actionBtns.forEach(b => b.disabled = false);
+                    actionTaken = false;
                 }
             });
         });
         
-        // Animation d'entrée
+        // Load revealed secrets
+        async function loadRevealedSecrets() {
+            revealedLoading.style.display = 'block';
+            revealedSecretsGrid.innerHTML = '';
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getRevealedSecrets`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.status === "success" && data.secrets.length > 0) {
+                        data.secrets.forEach(secret => {
+                            const secretCard = createSecretCard(secret);
+                            revealedSecretsGrid.appendChild(secretCard);
+                        });
+                    } else {
+                        revealedSecretsGrid.innerHTML = `
+                            <div class="no-secrets" style="text-align: center; grid-column: 1 / -1; padding: 40px;">
+                                <h3>No secrets revealed yet</h3>
+                                <p>Be the first to reveal a secret that resonates with others!</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    throw new Error('Error loading revealed secrets');
+                }
+            } catch (error) {
+                revealedSecretsGrid.innerHTML = `
+                    <div class="error" style="text-align: center; grid-column: 1 / -1; padding: 40px; color: ${var(--danger)};">
+                        <h3>Error loading secrets</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                revealedLoading.style.display = 'none';
+            }
+        }
+        
+        // Create secret card for revealed secrets
+        function createSecretCard(secret) {
+            const card = document.createElement('div');
+            card.className = 'secret-card';
+            
+            card.innerHTML = `
+                <div class="secret-emotion">${secret.emotion}</div>
+                <div class="secret-content">${secret.secret}</div>
+                <div class="stats-container">
+                    <div class="stat-item keep-stat">
+                        <div class="stat-value">${secret.keep}</div>
+                        <div class="stat-label">Keep</div>
+                    </div>
+                    <div class="stat-item forget-stat">
+                        <div class="stat-value">${secret.forget}</div>
+                        <div class="stat-label">Forget</div>
+                    </div>
+                    <div class="stat-item support-stat">
+                        <div class="stat-value">${secret.support}</div>
+                        <div class="stat-label">Support</div>
+                    </div>
+                    <div class="stat-item reveal-stat">
+                        <div class="stat-value">${secret.reveal}</div>
+                        <div class="stat-label">Reveal</div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRevealedSecrets();
+        });
+        
+        // Entrance animation
         setTimeout(() => {
             document.body.style.opacity = 1;
         }, 100);
