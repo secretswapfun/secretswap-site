@@ -687,16 +687,16 @@
             </div>
             
             <div class="actions-container" id="actionsContainer">
-                <button class="action-btn keep-btn" data-action="keep" disabled>
+                <button class="action-btn keep-btn" data-action="keep">
                     <span>📁</span> Keep
                 </button>
-                <button class="action-btn forget-btn" data-action="forget" disabled>
+                <button class="action-btn forget-btn" data-action="forget">
                     <span>🧹</span> Forget
                 </button>
-                <button class="action-btn support-btn" data-action="support" disabled>
+                <button class="action-btn support-btn" data-action="support">
                     <span>🤗</span> Support
                 </button>
-                <button class="action-btn reveal-btn" data-action="reveal" disabled>
+                <button class="action-btn reveal-btn" data-action="reveal">
                     <span>📣</span> Reveal
                 </button>
             </div>
@@ -777,7 +777,7 @@
 
     <script>
         // Configuration - TO UPDATE WITH YOUR INFORMATION
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOr3doKm0Np0mB2p669a1VdP092uFcQzBUHJOrfHAZhMgHVtC5j0oOh3cq_SY5XKe8Rw/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNMwjQCW5TzEQcyXV630wBm1iTrWLtDeC_OeQWQCPM9HJRVWpaOsXS-pIBipOjBLricA/exec";
         
         // DOM Elements
         const secretInput = document.getElementById('secretInput');
@@ -893,18 +893,12 @@
                             currentRowId = secretData.rowId;
                             resultTitle.textContent = "Here is a secret similar to yours:";
                             actionsContainer.style.display = 'flex';
-                            
-                            // Enable action buttons
-                            actionBtns.forEach(btn => btn.disabled = false);
                         }
                         
                         // Show result container
                         resultContainer.style.display = 'block';
                         
-                        // Hide the form
-                        secretFormContainer.style.display = 'none';
-                        
-                        // Reset form
+                        // Reset form (but keep it visible)
                         secretInput.value = '';
                         charCount.textContent = '0';
                         emotionBtns.forEach(b => b.classList.remove('selected'));
@@ -982,7 +976,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     
-                    if (data.status === "success" && data.secrets.length > 0) {
+                    if (data.status === "success" && data.secrets && data.secrets.length > 0) {
                         data.secrets.forEach(secret => {
                             const secretCard = createSecretCard(secret);
                             revealedSecretsGrid.appendChild(secretCard);
@@ -1000,7 +994,7 @@
                 }
             } catch (error) {
                 revealedSecretsGrid.innerHTML = `
-                    <div class="error" style="text-align: center; grid-column: 1 / -1; padding: 40px; color: ${var(--danger)};">
+                    <div class="error" style="text-align: center; grid-column: 1 / -1; padding: 40px; color: var(--danger);">
                         <h3>Error loading secrets</h3>
                         <p>${error.message}</p>
                     </div>
@@ -1044,6 +1038,10 @@
         // Initial load
         document.addEventListener('DOMContentLoaded', () => {
             loadRevealedSecrets();
+            
+            // Update character count on page load
+            charCount.textContent = secretInput.value.length;
+            updateSubmitButton();
         });
         
         // Entrance animation
