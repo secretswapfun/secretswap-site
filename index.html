@@ -15,6 +15,8 @@
             --text-light: #6c757d;
             --success: #28a745;
             --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
         }
         
         * {
@@ -25,7 +27,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, var(--light-bg) 0%, #e6e9f0 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f4 100%);
             min-height: 100vh;
             padding: 20px;
             color: var(--text-dark);
@@ -52,6 +54,13 @@
             font-size: 3.5rem;
             margin-right: 15px;
             color: var(--dark-purple);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         
         h1 {
@@ -59,6 +68,9 @@
             margin-bottom: 10px;
             color: var(--dark-purple);
             text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, var(--coral), var(--lavender));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .tagline {
@@ -77,6 +89,12 @@
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
         
         .container::before {
@@ -120,6 +138,7 @@
             justify-content: center;
             margin-right: 15px;
             font-size: 1.2rem;
+            font-weight: bold;
         }
         
         .secret-input {
@@ -132,12 +151,14 @@
             resize: vertical;
             transition: all 0.3s ease;
             margin-bottom: 20px;
+            background-color: #fafafa;
         }
         
         .secret-input:focus {
             outline: none;
             border-color: var(--lavender);
             box-shadow: 0 0 0 3px rgba(147, 112, 219, 0.2);
+            background-color: white;
         }
         
         .char-count {
@@ -168,6 +189,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: rgba(147, 112, 219, 0.05);
         }
         
         .emotion-btn:hover {
@@ -195,6 +217,8 @@
             font-weight: 600;
             letter-spacing: 0.5px;
             box-shadow: 0 5px 15px rgba(147, 112, 219, 0.3);
+            position: relative;
+            overflow: hidden;
         }
         
         .submit-btn:hover {
@@ -216,6 +240,12 @@
             border-radius: 15px;
             margin-top: 30px;
             display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .secret-result {
@@ -228,6 +258,10 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             position: relative;
             font-style: italic;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .secret-result::before,
@@ -236,6 +270,7 @@
             font-size: 3rem;
             position: absolute;
             color: rgba(147, 112, 219, 0.2);
+            font-family: serif;
         }
         
         .secret-result::before {
@@ -248,26 +283,66 @@
             right: 15px;
         }
         
-        .response-section {
-            margin-top: 30px;
+        .actions-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
         }
         
-        .response-btn {
-            background: var(--success);
-            color: white;
+        .action-btn {
+            padding: 12px 25px;
             border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            border-radius: 30px;
+            border-radius: 50px;
             cursor: pointer;
+            font-weight: 600;
             transition: all 0.3s ease;
-            font-weight: 500;
-            margin: 0 10px;
+            color: white;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .response-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(40, 167, 69, 0.3);
+        .keep-btn { 
+            background-color: var(--success); 
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+        
+        .forget-btn { 
+            background-color: var(--danger); 
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+        }
+        
+        .support-btn { 
+            background-color: var(--info); 
+            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);
+        }
+        
+        .reveal-btn { 
+            background-color: var(--warning); 
+            color: #333;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .thank-you-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--success);
+            font-weight: 500;
+            display: none;
+            animation: fadeIn 0.5s ease;
         }
         
         .premium-badge {
@@ -287,6 +362,7 @@
             color: var(--text-light);
             max-width: 800px;
             width: 100%;
+            font-size: 0.9rem;
         }
         
         .features {
@@ -304,6 +380,11 @@
             width: 220px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
         }
         
         .feature-icon {
@@ -345,6 +426,7 @@
             width: 100%;
             text-align: center;
             margin: 40px 0;
+            border-radius: 20px;
         }
         
         .how-it-works h2 {
@@ -373,6 +455,11 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-10px);
         }
         
         .step-number {
@@ -389,6 +476,7 @@
             justify-content: center;
             font-weight: bold;
             font-size: 1.3rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
         }
         
         .step-icon {
@@ -426,6 +514,35 @@
             .step-card {
                 width: 100%;
                 max-width: 400px;
+            }
+            
+            .actions-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .logo-icon {
+                font-size: 2.5rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+            
+            .submit-btn {
+                padding: 15px 30px;
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -467,15 +584,28 @@
         </div>
         
         <div class="result-container" id="resultContainer">
-            <h2>Voici un secret similaire au vôtre :</h2>
+            <h2 id="resultTitle">Voici un secret similaire au vôtre :</h2>
             <div class="secret-result" id="secretResult">
                 Chargement de votre secret...
             </div>
             
-            <div class="response-section">
-                <p>Envie de soutenir cette personne anonymement ?</p>
-                <button class="response-btn" id="freeResponse">Envoyer un message gratuit</button>
-                <button class="response-btn" id="premiumResponse">Envoyer un GIF animé <span class="premium-badge">1€</span></button>
+            <div class="actions-container" id="actionsContainer">
+                <button class="action-btn keep-btn" data-action="keep">
+                    <span>📁</span> Garder
+                </button>
+                <button class="action-btn forget-btn" data-action="forget">
+                    <span>🧹</span> Oublier
+                </button>
+                <button class="action-btn support-btn" data-action="support">
+                    <span>🤗</span> Soutenir
+                </button>
+                <button class="action-btn reveal-btn" data-action="reveal">
+                    <span>📣</span> Révéler
+                </button>
+            </div>
+            
+            <div class="thank-you-message" id="thankYouMessage">
+                Merci pour votre participation !
             </div>
         </div>
     </div>
@@ -499,12 +629,12 @@
                 <div class="step-icon">💌</div>
                 <div class="step-number">3</div>
                 <h3>Soutenez les autres</h3>
-                <p>Gardez, oubliez ou Soutenez un secret.</p>
+                <p>Gardez, oubliez ou soutenez un secret.</p>
             </div>
             <div class="step-card">
                 <div class="step-icon">🦊</div>
                 <div class="step-number">4</div>
-                <h3>Bientot :Libérez-le</h3>
+                <h3>Libérez-le</h3>
                 <p>Partagez ce secret avec le monde entier !</p>
             </div>
         </div>
@@ -539,7 +669,7 @@
 
     <script>
         // Configuration - À MODIFIER AVEC VOS INFORMATIONS
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwz1gTVUuxoQs4j1NxNOMsDXdycDzs4ogz1WPYBarTijXdo3dQY0hSU561l5LmKr1ovww/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwG6BSicoC7RsOrH4VkPl8MM6-6yEhb-O_cxcQFgy9HVs2xW3VuT9nKcsAQM37j0Z1qKA/exec";
         
         // Éléments du DOM
         const secretInput = document.getElementById('secretInput');
@@ -548,11 +678,14 @@
         const submitBtn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
         const resultContainer = document.getElementById('resultContainer');
+        const resultTitle = document.getElementById('resultTitle');
         const secretResult = document.getElementById('secretResult');
-        const freeResponseBtn = document.getElementById('freeResponse');
-        const premiumResponseBtn = document.getElementById('premiumResponse');
+        const actionsContainer = document.getElementById('actionsContainer');
+        const thankYouMessage = document.getElementById('thankYouMessage');
+        const actionBtns = document.querySelectorAll('.action-btn');
         
         let selectedEmotion = null;
+        let currentRowId = null;
         
         // Mise à jour du compteur de caractères
         secretInput.addEventListener('input', () => {
@@ -591,30 +724,40 @@
             // Afficher l'indicateur de chargement
             loading.style.display = 'block';
             submitBtn.disabled = true;
+            resultContainer.style.display = 'none';
+            actionsContainer.style.display = 'flex';
+            thankYouMessage.style.display = 'none';
             
             try {
                 // Envoyer les données à Google Sheets
                 const response = await fetch(
-                    `${SCRIPT_URL}?secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`
+                    `${SCRIPT_URL}?action=addSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`
                 );
                 
                 if (response.ok) {
-                    // Simuler un délai pour la recherche d'un secret similaire
-                    setTimeout(() => {
+                    // Maintenant, récupérer un secret aléatoire de la même émotion
+                    const secretResponse = await fetch(
+                        `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`
+                    );
+                    
+                    if (secretResponse.ok) {
+                        const secretData = await secretResponse.json();
+                        
                         // Cacher le chargement
                         loading.style.display = 'none';
                         
-                        // Afficher un secret aléatoire (simulation)
-                        const sampleSecrets = [
-                            "Je fais semblant d'être heureux tous les jours alors que je suis déprimé.",
-                            "J'ai triché lors de mon dernier examen important.",
-                            "Je regrette mon choix de carrière mais j'ai peur de tout changer maintenant.",
-                            "Je suis secrètement amoureux de mon meilleur ami.",
-                            "Je cache une dette importante à ma famille."
-                        ];
-                        
-                        const randomSecret = sampleSecrets[Math.floor(Math.random() * sampleSecrets.length)];
-                        secretResult.textContent = randomSecret;
+                        if (secretData.status === "no_secret") {
+                            // Aucun secret trouvé pour cette émotion
+                            resultTitle.textContent = "Vous êtes le premier avec cette émotion !";
+                            secretResult.textContent = "Partagez votre secret pour démarrer l'échange. Dès qu'une autre personne partagera un secret similaire, vous le recevrez.";
+                            actionsContainer.style.display = 'none';
+                        } else {
+                            // Afficher le secret récupéré
+                            secretResult.textContent = secretData.secret;
+                            currentRowId = secretData.rowId;
+                            resultTitle.textContent = "Voici un secret similaire au vôtre :";
+                            actionsContainer.style.display = 'flex';
+                        }
                         
                         // Afficher le résultat
                         resultContainer.style.display = 'block';
@@ -628,7 +771,9 @@
                         
                         // Faire défiler jusqu'au résultat
                         resultContainer.scrollIntoView({ behavior: 'smooth' });
-                    }, 2000);
+                    } else {
+                        throw new Error('Erreur lors de la récupération du secret');
+                    }
                 } else {
                     throw new Error('Erreur lors de la sauvegarde');
                 }
@@ -639,13 +784,33 @@
             }
         });
         
-        // Gestion des réponses
-        freeResponseBtn.addEventListener('click', () => {
-            alert("Votre message de soutien a été envoyé ! Merci pour votre bienveillance ❤️");
-        });
-        
-        premiumResponseBtn.addEventListener('click', () => {
-            alert("Fonctionnalité premium à venir ! Bientôt, vous pourrez envoyer des GIF réconfortants pour 1€.");
+        // Gestion des actions (Garder, Oublier, Soutenir, Révéler)
+        actionBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const action = btn.dataset.action;
+                
+                try {
+                    // Envoyer la requête pour incrémenter le compteur
+                    const response = await fetch(
+                        `${SCRIPT_URL}?action=increment&rowId=${currentRowId}&counterType=${action}`
+                    );
+                    
+                    if (response.ok) {
+                        // Cacher les boutons d'action et afficher le message de remerciement
+                        actionsContainer.style.display = 'none';
+                        thankYouMessage.style.display = 'block';
+                        
+                        // Masquer le message après 3 secondes
+                        setTimeout(() => {
+                            thankYouMessage.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        throw new Error('Erreur lors de la mise à jour');
+                    }
+                } catch (error) {
+                    alert("Erreur : " + error.message);
+                }
+            });
         });
         
         // Animation d'entrée
