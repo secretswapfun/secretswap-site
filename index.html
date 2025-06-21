@@ -4,643 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecretSwap.fun - Exchange your secrets anonymously</title>
-    <style>
-        :root {
-            --coral: #FF7F50;
-            --lavender: #9370DB;
-            --dark-purple: #6A5ACD;
-            --light-bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-dark: #343a40;
-            --text-light: #6c757d;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f4 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: var(--text-dark);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        header {
-            text-align: center;
-            padding: 30px 0;
-            max-width: 800px;
-            width: 100%;
-        }
-        
-        .logo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .logo-icon {
-            font-size: 3.5rem;
-            margin-right: 15px;
-            color: var(--dark-purple);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            color: var(--dark-purple);
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-            background: linear-gradient(135deg, var(--coral), var(--lavender));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .tagline {
-            font-size: 1.3rem;
-            color: var(--text-light);
-            margin-bottom: 25px;
-        }
-        
-        .container {
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-            padding: 30px;
-            max-width: 800px;
-            width: 100%;
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-        
-        .container::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            background: linear-gradient(90deg, var(--coral), var(--lavender));
-        }
-        
-        .step {
-            margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .step:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        h2 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: var(--dark-purple);
-            display: flex;
-            align-items: center;
-        }
-        
-        h2 span {
-            background: var(--lavender);
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        
-        .secret-input {
-            width: 100%;
-            min-height: 150px;
-            padding: 20px;
-            font-size: 1.1rem;
-            border: 2px dashed #e0e0e0;
-            border-radius: 12px;
-            resize: vertical;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-            background-color: #fafafa;
-        }
-        
-        .secret-input:focus {
-            outline: none;
-            border-color: var(--lavender);
-            box-shadow: 0 0 0 3px rgba(147, 112, 219, 0.2);
-            background-color: white;
-        }
-        
-        .char-count {
-            text-align: right;
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-        
-        .error-message {
-            color: var(--danger);
-            text-align: center;
-            margin: 10px 0;
-            display: none;
-        }
-        
-        .emotion-selector {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .emotion-btn {
-            font-size: 2.5rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 10px;
-            border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(147, 112, 219, 0.05);
-        }
-        
-        .emotion-btn:hover {
-            transform: scale(1.15);
-            background: rgba(147, 112, 219, 0.1);
-        }
-        
-        .emotion-btn.selected {
-            transform: scale(1.15);
-            background: rgba(147, 112, 219, 0.2);
-            box-shadow: 0 0 0 3px var(--lavender);
-        }
-        
-        .submit-btn {
-            background: linear-gradient(135deg, var(--coral), var(--lavender));
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            font-size: 1.3rem;
-            border-radius: 50px;
-            cursor: pointer;
-            display: block;
-            margin: 0 auto;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 5px 15px rgba(147, 112, 219, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(147, 112, 219, 0.4);
-        }
-        
-        .submit-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .result-container {
-            text-align: center;
-            padding: 30px;
-            background: rgba(147, 112, 219, 0.05);
-            border-radius: 15px;
-            margin-top: 30px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .secret-result {
-            font-size: 1.4rem;
-            line-height: 1.6;
-            margin: 25px 0;
-            padding: 25px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            position: relative;
-            font-style: italic;
-            min-height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .secret-result::before,
-        .secret-result::after {
-            content: '"';
-            font-size: 3rem;
-            position: absolute;
-            color: rgba(147, 112, 219, 0.2);
-            font-family: serif;
-        }
-        
-        .secret-result::before {
-            top: -5px;
-            left: 15px;
-        }
-        
-        .secret-result::after {
-            bottom: -35px;
-            right: 15px;
-        }
-        
-        .actions-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-        
-        .action-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .keep-btn { 
-            background-color: var(--success); 
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
-        }
-        
-        .forget-btn { 
-            background-color: var(--danger); 
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-        }
-        
-        .support-btn { 
-            background-color: var(--info); 
-            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);
-        }
-        
-        .reveal-btn { 
-            background-color: var(--warning); 
-            color: #333;
-            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        }
-        
-        .action-btn:active {
-            transform: translateY(1px);
-        }
-        
-        .action-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .thank-you-message {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 1.2rem;
-            color: var(--success);
-            font-weight: 500;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .revealed-secrets-container {
-            margin-top: 40px;
-            width: 100%;
-        }
-        
-        .revealed-secrets-title {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 2rem;
-            color: var(--dark-purple);
-            position: relative;
-            padding-bottom: 10px;
-        }
-        
-        .revealed-secrets-title::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--coral), var(--lavender));
-            border-radius: 2px;
-        }
-        
-        .secrets-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .secret-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-        
-        .secret-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        .secret-content {
-            font-size: 1.1rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 10px;
-            min-height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-style: italic;
-            position: relative;
-        }
-        
-        .secret-content::before,
-        .secret-content::after {
-            content: '"';
-            font-size: 2rem;
-            position: absolute;
-            color: rgba(147, 112, 219, 0.2);
-            font-family: serif;
-        }
-        
-        .secret-content::before {
-            top: 5px;
-            left: 10px;
-        }
-        
-        .secret-content::after {
-            bottom: -20px;
-            right: 10px;
-        }
-        
-        .secret-emotion {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            background: var(--lavender);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            z-index: 2;
-        }
-        
-        .stats-container {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 15px;
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .stat-value {
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-        
-        .keep-stat .stat-value { color: var(--success); }
-        .forget-stat .stat-value { color: var(--danger); }
-        .support-stat .stat-value { color: var(--info); }
-        .reveal-stat .stat-value { color: var(--warning); }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .spinner {
-            border: 5px solid rgba(147, 112, 219, 0.2);
-            border-top: 5px solid var(--lavender);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .how-it-works {
-            background: linear-gradient(135deg, #6A5ACD, #9370DB);
-            color: white;
-            padding: 60px 0;
-            width: 100%;
-            text-align: center;
-            margin: 40px 0;
-            border-radius: 20px;
-        }
-        
-        .how-it-works h2 {
-            color: white;
-            margin-bottom: 40px;
-            text-align: center;
-            font-size: 2.5rem;
-        }
-        
-        .steps {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .step-card {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 30px;
-            width: 280px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        
-        .step-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .step-number {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: white;
-            color: var(--dark-purple);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.3rem;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        }
-        
-        .step-icon {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            color: white;
-        }
-        
-        .step-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: white;
-        }
-        
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .container {
-                padding: 20px;
-            }
-            
-            .emotion-btn {
-                font-size: 2rem;
-                width: 70px;
-                height: 70px;
-            }
-            
-            .secret-result {
-                font-size: 1.2rem;
-                padding: 20px;
-            }
-            
-            .step-card {
-                width: 100%;
-                max-width: 400px;
-            }
-            
-            .actions-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .action-btn {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .secrets-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .logo-icon {
-                font-size: 2.5rem;
-            }
-            
-            .tagline {
-                font-size: 1.1rem;
-            }
-            
-            .submit-btn {
-                padding: 15px 30px;
-                font-size: 1.1rem;
-            }
-            
-            .revealed-secrets-title {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+    <script 
+  src="https://www.paypal.com/sdk/js?client-id=BAASqHmRUaw9JpJWNA3d0XElWNNDdRQdytHNxWDxEtZTz8gICMWyhyqiKfNtkbc4Q8-f2aYdN5VR_ailf8&components=hosted-buttons&disable-funding=venmo&currency=USD">
+</script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
@@ -679,32 +46,61 @@
             <div class="spinner"></div>
             <p>Looking for a similar secret...</p>
         </div>
+    </div>
+    
+    <div class="container" id="resultContainer" style="display: none;">
+        <h2 id="resultTitle">Here is a secret similar to yours:</h2>
+        <div class="secret-result" id="secretResult">
+            Loading your secret...
+        </div>
         
-        <div class="result-container" id="resultContainer">
-            <h2 id="resultTitle">Here is a secret similar to yours:</h2>
-            <div class="secret-result" id="secretResult">
-                Loading your secret...
-            </div>
-            
-            <div class="actions-container" id="actionsContainer">
-                <button class="action-btn keep-btn" data-action="keep">
-                    <span>📁</span> Keep
-                </button>
-                <button class="action-btn forget-btn" data-action="forget">
-                    <span>🧹</span> Forget
-                </button>
-                <button class="action-btn support-btn" data-action="support">
-                    <span>🤗</span> Support
-                </button>
-                <button class="action-btn reveal-btn" data-action="reveal">
-                    <span>📣</span> Reveal
-                </button>
-            </div>
-            
-            <div class="thank-you-message" id="thankYouMessage">
-                Thank you for participating!
+        <div class="actions-container" id="actionsContainer">
+            <button class="action-btn keep-btn" data-action="keep">
+                <span>📁</span> Keep
+            </button>
+            <button class="action-btn forget-btn" data-action="forget">
+                <span>🧹</span> Forget
+            </button>
+            <button class="action-btn support-btn" data-action="support">
+                <span>🤗</span> Support
+            </button>
+            <button class="action-btn reveal-btn" data-action="reveal">
+                <span>📣</span> Reveal
+            </button>
+        </div>
+        
+        <div class="paypal-container" id="paypalContainer">
+            <div class="paypal-text">How much do you value this secret?</div>
+            <div id="paypal-container-DKK8KM24TAJRE"></div>
+        </div>
+        
+        <div class="stats-display" id="statsDisplay">
+            <div class="stats-title">Community Response</div>
+            <div class="stats-grid">
+                <div class="stat-display">
+                    <div class="stat-display-value" id="keepStat">0</div>
+                    <div class="stat-display-label">Keep</div>
+                </div>
+                <div class="stat-display">
+                    <div class="stat-display-value" id="forgetStat">0</div>
+                    <div class="stat-display-label">Forget</div>
+                </div>
+                <div class="stat-display">
+                    <div class="stat-display-value" id="supportStat">0</div>
+                    <div class="stat-display-label">Support</div>
+                </div>
+                <div class="stat-display">
+                    <div class="stat-display-value" id="revealStat">0</div>
+                    <div class="stat-display-label">Reveal</div>
+                </div>
             </div>
         </div>
+        
+        <div class="thank-you-message" id="thankYouMessage">
+            Thank you for participating!
+        </div>
+        
+        <button class="restart-btn" id="restartBtn">Share another secret</button>
     </div>
     
     <div class="how-it-works">
@@ -772,11 +168,11 @@
     <footer>
         <p>© 2025 SecretSwap.fun - All rights reserved</p>
         <p>An anonymous and caring space to share what's on your mind</p>
-        <p><a href="#" style="color: var(--lavender); text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: var(--lavender); text-decoration: none;">Terms of Use</a></p>
+        <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
     </footer>
 
     <script>
-        // Configuration - TO UPDATE WITH YOUR INFORMATION
+        // Configuration - MISE À JOUR AVEC VOTRE URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxl22KQQGR-JZmUhOw17JZCHMMDz3hH_wM2ZzUMbYWFNqzjfeiiiCol9DEf-ifbu-E_1g/exec";
         
         // DOM Elements
@@ -796,10 +192,18 @@
         const secretFormContainer = document.getElementById('secretFormContainer');
         const revealedLoading = document.getElementById('revealedLoading');
         const revealedSecretsGrid = document.getElementById('revealedSecretsGrid');
+        const paypalContainer = document.getElementById('paypalContainer');
+        const statsDisplay = document.getElementById('statsDisplay');
+        const keepStat = document.getElementById('keepStat');
+        const forgetStat = document.getElementById('forgetStat');
+        const supportStat = document.getElementById('supportStat');
+        const revealStat = document.getElementById('revealStat');
+        const restartBtn = document.getElementById('restartBtn');
         
         let selectedEmotion = null;
         let currentRowId = null;
         let actionTaken = false;
+        let secretStats = { keep: 0, forget: 0, support: 0, reveal: 0 };
         
         // Update character counter
         secretInput.addEventListener('input', () => {
@@ -861,8 +265,6 @@
             // Show loading indicator
             loading.style.display = 'block';
             submitBtn.disabled = true;
-            resultContainer.style.display = 'none';
-            thankYouMessage.style.display = 'none';
             
             try {
                 // Send data to Google Sheets
@@ -870,52 +272,73 @@
                     `${SCRIPT_URL}?action=addSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`
                 );
                 
-                if (response.ok) {
-                    // Now get a random secret with the same emotion
-                    const secretResponse = await fetch(
-                        `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`
-                    );
-                    
-                    if (secretResponse.ok) {
-                        const secretData = await secretResponse.json();
-                        
-                        // Hide loading
-                        loading.style.display = 'none';
-                        
-                        if (secretData.status === "no_secret") {
-                            // No secret found for this emotion
-                            resultTitle.textContent = "You're the first with this emotion!";
-                            secretResult.textContent = "Share your secret to start the exchange. As soon as another person shares a similar secret, you'll receive it.";
-                            actionsContainer.style.display = 'none';
-                        } else {
-                            // Show the retrieved secret
-                            secretResult.textContent = secretData.secret;
-                            currentRowId = secretData.rowId;
-                            resultTitle.textContent = "Here is a secret similar to yours:";
-                            actionsContainer.style.display = 'flex';
-                        }
-                        
-                        // Show result container
-                        resultContainer.style.display = 'block';
-                        
-                        // Reset form (but keep it visible)
-                        secretInput.value = '';
-                        charCount.textContent = '0';
-                        emotionBtns.forEach(b => b.classList.remove('selected'));
-                        selectedEmotion = null;
-                        submitBtn.disabled = true;
-                        
-                        // Scroll to result
-                        resultContainer.scrollIntoView({ behavior: 'smooth' });
-                        
-                        // Load revealed secrets
-                        loadRevealedSecrets();
-                    } else {
-                        throw new Error('Error retrieving secret');
-                    }
-                } else {
-                    throw new Error('Save error');
+                if (!response.ok) {
+                    throw new Error('Failed to save secret');
                 }
+                
+                const saveResult = await response.json();
+                if (saveResult.status !== 'success') {
+                    throw new Error(saveResult.message || 'Error saving secret');
+                }
+                
+                // Now get a random secret with the same emotion
+                const secretResponse = await fetch(
+                    `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`
+                );
+                
+                if (!secretResponse.ok) {
+                    throw new Error('Failed to retrieve secret');
+                }
+                
+                const secretData = await secretResponse.json();
+                
+                // Hide loading
+                loading.style.display = 'none';
+                
+                // Hide the form container
+                secretFormContainer.style.display = 'none';
+                
+                // Show the result container
+                resultContainer.style.display = 'block';
+                
+                if (secretData.status === "no_secret") {
+                    // No secret found for this emotion
+                    resultTitle.textContent = "You're the first with this emotion!";
+                    secretResult.textContent = "Share your secret to start the exchange. As soon as another person shares a similar secret, you'll receive it.";
+                    actionsContainer.style.display = 'none';
+                } else {
+                    // Show the retrieved secret
+                    secretResult.textContent = secretData.secret;
+                    currentRowId = secretData.rowId;
+                    resultTitle.textContent = "Here is a secret similar to yours:";
+                    actionsContainer.style.display = 'flex';
+                }
+                
+                // Reset form (but keep it hidden)
+                secretInput.value = '';
+                charCount.textContent = '0';
+                emotionBtns.forEach(b => b.classList.remove('selected'));
+                selectedEmotion = null;
+                submitBtn.disabled = true;
+                
+                // Reset action buttons
+                actionBtns.forEach(b => b.disabled = false);
+                actionTaken = false;
+                
+                // Hide PayPal container initially
+                paypalContainer.style.display = 'none';
+                
+                // Hide stats display
+                statsDisplay.style.display = 'none';
+                
+                // Hide thank you message
+                thankYouMessage.style.display = 'none';
+                
+                // Scroll to result
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+                
+                // Load revealed secrets
+                loadRevealedSecrets();
             } catch (error) {
                 loading.style.display = 'none';
                 submitBtn.disabled = false;
@@ -940,22 +363,53 @@
                         `${SCRIPT_URL}?action=increment&rowId=${currentRowId}&counterType=${action}`
                     );
                     
-                    if (response.ok) {
-                        // Hide action buttons and show thank you message
-                        actionsContainer.style.display = 'none';
-                        thankYouMessage.style.display = 'block';
+                    if (!response.ok) {
+                        throw new Error('Failed to update counter');
+                    }
+                    
+                    const result = await response.json();
+                    if (result.status !== 'success') {
+                        throw new Error(result.message || 'Error updating counter');
+                    }
+                    
+                    // Get updated stats for this secret
+                    const statsResponse = await fetch(
+                        `${SCRIPT_URL}?action=getSecretStats&rowId=${currentRowId}`
+                    );
+                    
+                    if (!statsResponse.ok) {
+                        throw new Error('Failed to get updated stats');
+                    }
+                    
+                    const statsData = await statsResponse.json();
+                    if (statsData.status === 'success') {
+                        // Update local stats
+                        secretStats.keep = statsData.keep;
+                        secretStats.forget = statsData.forget;
+                        secretStats.support = statsData.support;
+                        secretStats.reveal = statsData.reveal;
                         
-                        // Hide message after 3 seconds
-                        setTimeout(() => {
-                            thankYouMessage.style.display = 'none';
-                        }, 3000);
+                        // Show stats display
+                        updateStatsDisplay();
+                        statsDisplay.style.display = 'block';
+                    }
+                    
+                    // Show PayPal container only for Reveal action
+                    if (action === 'reveal') {
+                        paypalContainer.style.display = 'block';
                         
-                        // If action is reveal, reload revealed secrets
-                        if (action === 'reveal') {
-                            loadRevealedSecrets();
-                        }
-                    } else {
-                        throw new Error('Update error');
+                        // Initialize PayPal button
+                        paypal.HostedButtons({
+                            hostedButtonId: "DKK8KM24TAJRE",
+                        }).render("#paypal-container-DKK8KM24TAJRE");
+                    }
+                    
+                    // Show thank you message
+                    thankYouMessage.style.display = 'block';
+                    
+                    // If action is reveal, reload revealed secrets
+                    if (action === 'reveal') {
+                        loadRevealedSecrets();
                     }
                 } catch (error) {
                     alert("Error: " + error.message);
@@ -963,6 +417,21 @@
                     actionTaken = false;
                 }
             });
+        });
+        
+        // Update stats display
+        function updateStatsDisplay() {
+            keepStat.textContent = secretStats.keep;
+            forgetStat.textContent = secretStats.forget;
+            supportStat.textContent = secretStats.support;
+            revealStat.textContent = secretStats.reveal;
+        }
+        
+        // Restart button - show form again
+        restartBtn.addEventListener('click', () => {
+            resultContainer.style.display = 'none';
+            secretFormContainer.style.display = 'block';
+            secretFormContainer.scrollIntoView({ behavior: 'smooth' });
         });
         
         // Load revealed secrets
@@ -973,28 +442,28 @@
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getRevealedSecrets`);
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    if (data.status === "success" && data.secrets && data.secrets.length > 0) {
-                        data.secrets.forEach(secret => {
-                            const secretCard = createSecretCard(secret);
-                            revealedSecretsGrid.appendChild(secretCard);
-                        });
-                    } else {
-                        revealedSecretsGrid.innerHTML = `
-                            <div class="no-secrets" style="text-align: center; grid-column: 1 / -1; padding: 40px;">
-                                <h3>No secrets revealed yet</h3>
-                                <p>Be the first to reveal a secret that resonates with others!</p>
-                            </div>
-                        `;
-                    }
+                if (!response.ok) {
+                    throw new Error('Failed to load revealed secrets');
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === "success" && data.secrets && data.secrets.length > 0) {
+                    data.secrets.forEach(secret => {
+                        const secretCard = createSecretCard(secret);
+                        revealedSecretsGrid.appendChild(secretCard);
+                    });
                 } else {
-                    throw new Error('Error loading revealed secrets');
+                    revealedSecretsGrid.innerHTML = `
+                        <div class="no-secrets" style="text-align: center; grid-column: 1 / -1; padding: 40px;">
+                            <h3>No secrets revealed yet</h3>
+                            <p>Be the first to reveal a secret that resonates with others!</p>
+                        </div>
+                    `;
                 }
             } catch (error) {
                 revealedSecretsGrid.innerHTML = `
-                    <div class="error" style="text-align: center; grid-column: 1 / -1; padding: 40px; color: var(--danger);">
+                    <div class="error" style="text-align: center; grid-column: 1 / -1; padding: 40px; color: var(--coral);">
                         <h3>Error loading secrets</h3>
                         <p>${error.message}</p>
                     </div>
@@ -1042,12 +511,13 @@
             // Update character count on page load
             charCount.textContent = secretInput.value.length;
             updateSubmitButton();
+            
+            // Hide the result container initially
+            resultContainer.style.display = 'none';
+            
+            // Hide PayPal container initially
+            paypalContainer.style.display = 'none';
         });
-        
-        // Entrance animation
-        setTimeout(() => {
-            document.body.style.opacity = 1;
-        }, 100);
     </script>
 </body>
 </html>
