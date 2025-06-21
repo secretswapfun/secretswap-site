@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Double or Nothing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c1a30, #1a2a6c, #0f2027);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #2a5885;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #f7931a, #e2780d);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            grid-column: span 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .bitcoin-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2.5rem;
+            color: #f7931a;
+            animation: pulse 2s infinite;
+        }
+        
+        .slot-machine-icon {
+            font-size: 3rem;
+            animation: spin 3s infinite linear;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            background: rgba(30, 40, 70, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #354b7a;
+        }
+        
+        .section-title {
+            color: #f7931a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f7931a;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 2px solid #354b7a;
+            background: rgba(20, 30, 50, 0.7);
+            color: white;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #f7931a;
+            outline: none;
+            background: rgba(30, 40, 70, 0.8);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #f7931a, #e2780d);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(90deg, #ffa726, #f57c00);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 147, 26, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background: #555;
+        }
+        
+        .address-container {
+            display: flex;
+            margin-top: 20px;
+            background: rgba(20, 30, 50, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #354b7a;
+        }
+        
+        .address-display {
+            flex: 1;
+            padding: 14px;
+            font-family: monospace;
+            word-break: break-all;
+            color: #f7931a;
+            font-weight: bold;
+        }
+        
+        .copy-btn {
+            background: #2a5885;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .copy-btn:hover {
+            background: #3a68a5;
+        }
+        
+        .copy-btn i {
+            margin-right: 8px;
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(247, 147, 26, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #f7931a;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #f7931a;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .warning {
+            background: rgba(231, 76, 60, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #e74c3c;
+            text-align: center;
+        }
+        
+        .game-result {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: rgba(40, 180, 99, 0.15);
+            border: 2px solid #28b463;
+            display: none;
+        }
+        
+        .game-result h3 {
+            color: #28b463;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .game-result.lose {
+            background: rgba(231, 76, 60, 0.15);
+            border: 2px solid #e74c3c;
+        }
+        
+        .game-result.lose h3 {
+            color: #e74c3c;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid #2a5885;
+            grid-column: span 2;
+        }
+        
+        /* Chat section */
+        .chat-section {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-container {
+            background: rgba(30, 40, 70, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #354b7a;
+            height: 100%;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(20, 30, 50, 0.5);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            max-height: 500px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(40, 50, 90, 0.6);
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .message-user {
+            background: rgba(247, 147, 26, 0.15);
+            border-left: 3px solid #f7931a;
+        }
+        
+        .message-system {
+            background: rgba(52, 152, 219, 0.15);
+            border-left: 3px solid #3498db;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .username {
+            font-weight: bold;
+            color: #f7931a;
+        }
+        
+        .timestamp {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+        
+        .message-content {
+            line-height: 1.4;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+        }
+        
+        .chat-input button {
+            padding: 12px 20px;
+            background: #2a5885;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .chat-input button:hover {
+            background: #3a68a5;
+        }
+        
+        /* Notifications */
+        .notifications-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        .notification {
+            background: rgba(30, 40, 70, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f7931a;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in 4.5s forwards;
+        }
+        
+        .notification-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .notification-icon {
+            width: 30px;
+            height: 30px;
+            background: #f7931a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        
+        .notification-title {
+            font-weight: bold;
+            color: #f7931a;
+        }
+        
+        .notification-content {
+            font-size: 0.9rem;
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Bandit Manchot */
+        .slot-machine {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            perspective: 1000px;
+        }
+        
+        .reel {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            border: 3px solid #f7931a;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(20, 30, 50, 0.7);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .reel-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: transform 0.5s ease-out;
+        }
+        
+        .symbol {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .spin-button {
+            background: linear-gradient(90deg, #f7931a, #e2780d);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 20px auto;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .spin-button:hover {
+            background: linear-gradient(90deg, #ffa726, #f57c00);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 147, 26, 0.4);
+        }
+        
+        .spin-button.hidden {
+            display: none;
+        }
+        
+        .game-area {
+            text-align: center;
+            padding: 30px;
+            background: rgba(30, 40, 70, 0.6);
+            border-radius: 15px;
+            border: 1px solid #354b7a;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .thank-you {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        
+        .thank-you h2 {
+            font-size: 2.5rem;
+            color: #f7931a;
+            margin-bottom: 20px;
+        }
+        
+        .thank-you p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        
+        /* Visitor info section */
+        .visitor-info {
+            background: rgba(30, 40, 70, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #354b7a;
+            display: none;
+        }
+        
+        .visitor-info h3 {
+            color: #f7931a;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .visitor-info p {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(20, 30, 50, 0.5);
+            border-radius: 8px;
+        }
+        
+        /* Rating section */
+        .rating-section {
+            background: rgba(30, 40, 70, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid #354b7a;
+            text-align: center;
+            display: none;
+        }
+        
+        .rating-section h3 {
+            color: #f7931a;
+            margin-bottom: 20px;
+        }
+        
+        .rating-stars {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .rating-stars i {
+            color: #555;
+            cursor: pointer;
+            transition: color 0.2s;
+            margin: 0 5px;
+        }
+        
+        .rating-stars i.active {
+            color: #ffc107;
+        }
+        /* Arrêter la rotation du logo */
+.slot-machine-icon {
+    font-size: 7rem;
+    animation: pulse 2s infinite; /* Remplacement de l'animation spin par pulse */
+}
+
+/* Style des étoiles d'avis */
+.reviews {
+    text-align: center; /* Centrer le contenu */
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(30, 40, 70, 0.6);
+    border-radius: 15px;
+    border: 1px solid #354b7a;
+}
+
+#overall-stars {
+    font-size: 2.5rem; /* Taille augmentée */
+    color: #FFD700;    /* Couleur jaune doré */
+    margin: 10px 0;
+}
+
+#overall-stars i {
+    margin: 0 3px;
+}
+
+#overall-rating, #total-votes {
+    font-size: 1.2rem;
+    margin: 5px 0;
+}
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                grid-column: span 1;
+            }
+            
+            .footer {
+                grid-column: span 1;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .reel {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .symbol {
+                height: 80px;
+                font-size: 2rem;
+            }
+            
+            .thank-you h2 {
+                font-size: 2rem;
+            }
+            
+            .thank-you p {
+                font-size: 1.2rem;
+            }
+			
+        }
+   
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="slot-machine-icon">🎰</div>
+            <div>
+                <h1>BITCOIN DOUBLE OR NOTHING</h1>
+                <p>Try your luck to double your bitcoins!</p>
+				
+            </div>
+            <p> <a href="/fr" class="lang-switcher" title="French Version">
+                <i><img src="../doc/fr.png" height="30">  </img></i>
+            </a> </p><i class="fab fa-bitcoin bitcoin-icon"></i>
+        </div>
+        
+        <div class="content">
+            <div class="section" id="pseudo-section">
+                <h2 class="section-title">Game Access</h2>
+                <div class="form-group">
+                    <label for="pseudo" class="required">Your Username</label>
+                    <input type="text" id="pseudo" placeholder="Enter your username" required>
+                    <div class="error-message" id="pseudo-error">Please enter your username</div>
+                </div>
+            </div>
+            
+            <div class="section" id="address-section">
+                <h2 class="section-title">Your Receiving Address</h2>
+                <div class="form-group">
+                    <label for="receive-address" class="required">Bitcoin address to receive your winnings</label>
+                    <input type="text" id="receive-address" placeholder="36EnE5V76r7Tq2pAmp8aeRJKTYbyM9sRoB" required>
+                    <div class="error-message" id="address-error">Please enter a valid Bitcoin address</div>
+                </div>
+            </div>
+            
+            <div class="section" id="amount-section">
+                <h2 class="section-title">Amount to Double</h2>
+                <div class="form-group">
+                    <label for="amount" class="required">Amount in BTC</label>
+                    <input type="number" id="amount" placeholder="0.0001" min="0.0001" max="2" step="0.0001" required>
+                    <div class="error-message" id="amount-error">Amount must be between 0.0001 and 2 BTC</div>
+                </div>
+                
+                <div class="instructions">
+                    <h3>How to play:</h3>
+                    <ul>
+                        <li>Enter your username, receiving address, and amount to double</li>
+                        <li>Click "Play Now" to start the slot machine</li>
+                        <li>1 free game per 24 hours</li>
+                        <li>If you win, send the exact bet amount to the displayed address</li>
+                        <li>After validation, your doubled amount will be sent to your address!</li>
+                        <li>If you lose, come back tomorrow</li>
+                        <li>Probability: 50% chance! ;)</li>
+                    </ul>
+                </div>
+                
+                <button class="btn" id="play-btn">Play Now</button>
+            </div>
+            
+            <div class="game-area" id="game-area">
+                <h2 class="section-title">Double or Nothing</h2>
+                <p>Click the button to try to double your bet!</p>
+                
+                <div class="slot-machine">
+                    <!-- [Les rouleaux restent identiques] -->
+                </div>
+                
+                <button class="spin-button" id="spin-btn">Spin</button>
+                
+                <p id="game-result-text">Your bet: <span id="game-amount">0.0001</span> BTC</p>
+            </div>
+            
+            <div class="game-result" id="final-result">
+                <h3>Congratulations!</h3>
+                <p>You doubled your bet of <span id="win-amount">0.0002</span> BTC!</p>
+                <p>You will receive <strong><span id="total-win">0.0004</span> BTC</strong> at <span id="receive-address">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</span> after validation</p>
+            </div>
+            
+            <div class="game-result lose" id="lose-result" style="display: none;">
+                <h3>Too Bad!</h3>
+                <p>You didn't double your bet of <span id="lose-amount">0.001</span> BTC.</p>
+                <p>Come back tomorrow for another chance!</p>
+            </div>
+            
+            <div class="section" id="send-btc-section" style="display: none;">
+                <h2 class="section-title">Validation</h2>
+                <p>Please send <strong><span id="send-amount">0.001</span> BTC</strong> to this address:</p>
+                
+                <div class="address-container">
+                    <div class="address-display" id="btc-address">36EnE5V76r7Tq2pAmp8aeRJKTYbyM9sRoB</div>
+                    <button class="copy-btn" id="copy-btn">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div><img src="doc/qrc.jpg"></div>
+                
+                <button class="btn" id="validate-btn" style="margin-top: 20px;">
+                    <i class="fas fa-check-circle"></i> Validate My Transfer
+                </button>
+            </div>
+            
+            <div class="thank-you" id="thank-you">
+                <h2>Thank you for playing!</h2>
+                <p>See you tomorrow for new adventures!</p>
+                <div style="font-size: 5rem; color: #f7931a; margin: 20px 0;">
+                    <i class="fab fa-bitcoin"></i>
+                </div>
+                <p>Your winnings will be sent to your Bitcoin address within 48 hours maximum</p>
+            </div>
+            
+            <!-- Visitor info section -->
+            <div class="visitor-info" id="visitor-info">
+                <h3>Your Information</h3>
+                <p><strong>Username:</strong> <span id="info-pseudo"></span></p>
+                <p><strong>BTC Address:</strong> <span id="info-address"></span></p>
+                <p><strong>Last Bet:</strong> <span id="info-amount"></span> BTC</p>
+            </div>
+            
+            <!-- Rating section -->
+            <div class="rating-section" id="rating-section">
+                <h3>Rate Your Experience</h3>
+                <p>How did you find your gaming experience?</p>
+                
+                <div class="rating-stars" id="rating-stars">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+                
+                <button class="btn" id="submit-rating">Submit Rating</button>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <h2 class="section-title">Live Chat</h2>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message message-system">
+                    <div class="message-header">
+                        <span class="username">System</span>
+                        <span class="timestamp">Now</span>
+                    </div>
+                    <div class="message-content">Welcome to Bitcoin Double or Nothing! Chat with other players and share your experiences.</div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chat-input" placeholder="Type your message...">
+                <button id="send-btn">Send</button>
+            </div>
+            
+            <!-- Reviews Section -->
+            <div class="reviews">
+                <h3>Player Reviews</h3>
+                <div class="stars" id="overall-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <div class="rating" id="overall-rating">4.5/5</div>
+                <div class="votes" id="total-votes">Based on 1,258 reviews</div>
+				<div align="center"> <img src="doc/ok.png" height="200">  </img></div>
+            </div>
+			
+        </div>
+        
+        <div class="notifications-container" id="notifications-container">
+            <!-- Notifications will appear here -->
+        </div>
+        
+        <div class="footer">
+            <p>Gambling game - Play responsibly | <a href="doc/doc.html"> GCU</a></p></p>
+            <p>© 2023 Bitcoin Double or Nothing. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Copy BTC Address
+            const copyBtn = document.getElementById('copy-btn');
+            const btcAddress = document.getElementById('btc-address');
+            
+            copyBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(btcAddress.textContent)
+                    .then(() => {
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                        }, 2000);
+                    });
+            });
+            
+            // Game Elements
+            const playBtn = document.getElementById('play-btn');
+            const gameArea = document.getElementById('game-area');
+            const spinBtn = document.getElementById('spin-btn');
+            const gameResult = document.getElementById('final-result');
+            const loseResult = document.getElementById('lose-result');
+            const winAmount = document.getElementById('win-amount');
+            const totalWin = document.getElementById('total-win');
+            const gameAmount = document.getElementById('game-amount');
+            const loseAmount = document.getElementById('lose-amount');
+            const sendAmount = document.getElementById('send-amount');
+            const gameResultText = document.getElementById('game-result-text');
+            const amountInput = document.getElementById('amount');
+            const chatMessages = document.getElementById('chat-messages');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const notificationsContainer = document.getElementById('notifications-container');
+            const sendBtcSection = document.getElementById('send-btc-section');
+            const validateBtn = document.getElementById('validate-btn');
+            const thankYou = document.getElementById('thank-you');
+            const ratingSection = document.getElementById('rating-section');
+            const ratingStars = document.getElementById('rating-stars');
+            const submitRatingBtn = document.getElementById('submit-rating');
+            const overallStars = document.getElementById('overall-stars');
+            const overallRating = document.getElementById('overall-rating');
+            const totalVotes = document.getElementById('total-votes');
+            
+            // Error Elements
+            const pseudoError = document.getElementById('pseudo-error');
+            const addressError = document.getElementById('address-error');
+            const amountError = document.getElementById('amount-error');
+            
+            // Section Elements
+            const pseudoSection = document.getElementById('pseudo-section');
+            const addressSection = document.getElementById('address-section');
+            const amountSection = document.getElementById('amount-section');
+            const visitorInfo = document.getElementById('visitor-info');
+            const infoPseudo = document.getElementById('info-pseudo');
+            const infoAddress = document.getElementById('info-address');
+            const infoAmount = document.getElementById('info-amount');
+            
+            // Reviews Data
+            let totalReviews = 1258;
+            let totalRating = 4.5 * totalReviews;
+            let currentUserRating = 0;
+            
+            // Usernames for notifications and messages
+            const pseudos = [
+                "BitcoinLover", "CryptoKing", "SatoshiFan", "BlockchainGuru", "CryptoTrader", 
+                "HodlMaster", "BullRun2025", "MoonLambos", "Pat84", "marie1989", "Gegelamenace", 
+                "geeko34", "BTCWhale", "SatoshiNakamoto", "CryptoQueen", "DigitalGold", "BitcoinMaxi", 
+                "AltcoinSkeptic", "NodeRunner", "LightningUser", "Bobby", "Seb24", "Kate", "marie30", 
+                "Bitosss", "Ctoilepseudo", "trucdeouf91", "natlo1989", "lapindefer", "kratoss55", 
+                "Alecon", "Hophophop", "Amoilamoula", "Elon32", "Tom2002", "Zakari", "CryptoMiner42", 
+                "BlockMaster99", "DeFiDabbler", "NFTGuru", "EthereumMaxi", "CryptoPunk77", "HodlForever", 
+                "ToTheMoon", "BitcoinOracle", "SatoshisVision", "FiatDestroyer", "SharkPool", "BullishAF", 
+                "DigitalNomad", "CryptoNinja", "WhaleWatcher", "LamboDreams", "BitcoinBaron", "ChainlinkLord", 
+                "RippleSkeptic", "TradingBot", "ColdStorage", "PrivateKeyGuru", "GenesisBlock", "FOMOQueen", 
+                "AltcoinTrader", "StakingRewards", "SmartContract", "GasFeeWatcher", "DecentralizeAll", 
+                "DappDev", "Web3Explorer", "MetaversePioneer", "DAOEnthusiast", "Cypherpunk", "SatoshiGhost", 
+                "BitcoinBeard", "CryptoWife", "BlockchainBaby", "HodlGang", "MoonMath", "ZeroKnowledge", 
+                "ShillAlert", "BagHolder", "DiamondHands", "PaperHands", "CryptoNoob", "BitcoinYoda", 
+                "AltcoinSherpa", "BearMarketPro", "BullMarketKing", "CryptoArchitect", "DefiDegenerate", 
+                "NFTCollector", "TokenMaster", "AirDropHunter", "KYCnot", "SatsStacker", "OrangePill", 
+                "Bitcoiner4Life", "CryptoAnarchist", "LightningNetwork", "MempoolWatcher", "FeesTooHigh", 
+                "TaprootEnjoyer", "SegwitFan", "MiningRig", "ASICOwner", "GPUminer", "GreenEnergyMiner", 
+                "RenewableBTC", "CarbonCreditCrypto", "EcoCrypto", "ScamHunter", "RugPullVictim", 
+                "CryptoDetective", "BlockchainAuditor", "SolidityDev", "Rustacean", "MovePro", "CosmosFan", 
+                "PolkadotPal", "CardanoCult", "SolanaSailor", "AvalancheAnon", "AlgorandAlly", "TerraClassic", 
+                "LunaGhost", "USTDebt", "StablecoinUser", "DAIHolder", "USDCrich", "TetherSkeptic", 
+                "WBTCminter", "LiquidStaker", "CrossChain", "BridgeValidator", "OracleNode", "TheGraphGuru", 
+                "IPFSuser", "FilecoinFarmer", "ArweaveArchiver", "HeliumHotspot", "5GMiner", "IOTexpert", 
+                "CryptoGamer", "Play2Earn", "AxieBreeder", "SandboxLand", "DecentralandVIP", "NFTartist", 
+                "CryptoPoet", "DigitalPainter", "MetaverseRealtor", "VRexplorer", "ARcreator", "Web3Designer", 
+                "TokenEconomist", "GovernanceGuru", "VotingPower", "ProposalMaker", "TreasuryManager", 
+                "CryptoJournalist", "BlockchainBlogger", "YouTuberCrypto", "PodcastHost", "TikTokTrader", 
+                "TwitterInfluencer", "DiscordMod", "TelegramAdmin", "RedditMod", "BitcointalkOG", 
+                "CryptoMentor", "TradingCoach", "TAexpert", "FundamentalAnalyst", "OnChainSpy", "WhaleAlertBot", 
+                "CryptoLawyer", "RegulationWatcher", "TaxHelper", "ComplianceOfficer", "KYCworker", 
+                "AMLslayer", "PrivacyAdvocate", "MoneroFan", "ZcashUser", "SecretNetwork", "TornadoCash", 
+                "MixerUser", "CoinJoiner", "CypherpunkPriest", "AnonCatholic", "CryptoBuddhist", 
+                "HodlHindu", "IslamicCoin", "JewishCrypto", "SatoshiScientist", "QuantumResistant", 
+                "MathGeek", "PhysicsProf", "CodeIsLaw", "SmartEngineer", "GitHubCoder", "BugBounty", 
+                "WhiteHat", "BlackHat", "GrayHat", "Exploiter", "RugBuilder", "ExitScammer", 
+                "PonziSchemer", "PyramidFan", "MLMking", "AffiliateMarketer", "CryptoShill", "PumpGroup", 
+                "DumpGroup", "WhaleManipulator", "MarketMaker", "LiquidityProvider", "ArbitrageBot", 
+                "FlashLoan", "Liquidator", "DebtCollector", "MarginCall", "LeverageMax", "ShortSqueeze", 
+                "LongTermHodl", "SwingTrader", "DayTrader", "Scalper", "CryptoBot", "AlgorithmMaster", 
+                "PythonTrader", "JavaScriptCoder", "RustDeveloper", "GolangGuru", "JavaJoker", "CplusplusCoder", 
+                "HaskellHodler", "FunctionalFan", "OOPmaster", "SoliditySniper", "VyperExpert", "MoveMaster", 
+                "CosmosSDK", "SubstrateBuilder", "EVMexpert", "WasmWizard", "ZKrollup", "OptimisticRollup", 
+                "Sidechain", "L2maxi", "ShardChampion", "Parachain", "BridgeHacker", "Interoperability", 
+                "CrossChainDex", "AMMuser", "LiquidityMiner", "YieldFarmer", "ImpermanentLoss", 
+                "APYchaser", "StableYield", "VolatilityLover", "RiskManager", "PortfolioDiversifier", 
+                "AllWeather", "CryptoIndex", "Top10coins", "ShitcoinSlinger", "MemeCoinMillionaire", 
+                "DogecoinDude", "ShibArmy", "FlokiInu", "SafemoonSam", "BonkFan", "PepeCoin", 
+                "Wojak", "NGUMI", "Based", "CultDao", "AnonDev", "ZeroDev", 
+                "AlphaLeak", "InsiderTrading", "FrontRunner", "MEVextractor", "SandwichBot", 
+                "DarkForest", "CensorshipResistant", "Permissionless", "Trustless", "Decentralized", 
+                "Immutable", "CryptoUtopia", "DigitalFreedom", "SovereignIndividual", "SelfCustody", 
+                "NotYourKeys", "HardwareWallet", "LedgerUser", "TrezorFan", "ColdCard", "SeedPhrase", 
+                "24words", "BIP39", "MultiSig", "GnosisSafe", "SocialRecovery", "VitalikFan", 
+                "SatoshiSeeker", "HalFinney", "NickSzabo", "AdamBack", "MichaelSaylor", "CZbinance", 
+                "SBFfree", "DoKwon", "JustinSun", "CharlesHoskinson", "GavinWood", "AnatolyYak", 
+                "ElonaMusk", "JackDorsey", "CryptoCrusader", "BitcoinJesus", "CryptoCowboy", "DigitalDuke", 
+                "BlockchainBaron", "CryptoCount", "HodlPrince", "MoonKing", "MarsColonizer", "SpaceXfan", 
+                "BlueOrigin", "Web3Warrior", "MetaverseMonarch", "NFTSultan", "DeFiDuke", "DAOduke"
+            ];
+            
+            // Positive chat messages (doubled)
+            const positiveMessages = [
+                "Awesome, it really works! I doubled my BTC!",
+                "I just won 0.05 BTC, it's amazing!",
+                "This game is legit, I recommend it to everyone!",
+                "Transaction received in less than 10 hours, great!",
+                "I tried with 0.01 BTC and received 0.02 BTC, perfect!",
+                "The best Bitcoin game I've found so far!",
+                "Damn, they actually pay.",
+                "Easy to use and fast payments, 5 stars!",
+                "I received my winnings in just 2 hours",
+                "Playing here has become my favorite activity, see you tomorrow!",
+                "Cool",
+                "I won 3 days in a row, this game is incredible!",
+                "Transactions are fast and reliable!",
+                "I've never had any problems with this site!",
+                "The best investment of my week!",
+                "I received 0.1 BTC after sending 0.05 BTC, thank you!",
+                "Let's go!",
+                "I just doubled my initial investment",
+                "let's go!",
+                "I've been playing for 2 weeks and already multiplied my BTC by 5!",
+                "The process is simple and transparent!",
+                "I never thought it would work so well!",
+                "I just received my winnings, it's perfect!",
+                "I highly recommend this game to all crypto enthusiasts!",
+                "I've tried several times, always paid!",
+                "The best decision I've made this year!",
+                "I'm so happy I discovered this game!",
+                "I just won 0.2 BTC, I'm over the moon!",
+                "The game is fair and the winnings are real!",
+                "I didn't think it was possible, but it works!"
+            ];
+            
+            // Doubt chat messages (doubled)
+            const doubtMessages = [
+                "Has anyone really received winnings?",
+                "Have you tried with more than 0.1 BTC?",
+                "I wonder if it's really safe...",
+                "How long does it take to receive winnings?",
+                "Is the game really random?",
+                "I haven't received my winnings yet, is that normal?",
+                "Why didn't I receive anything?",
+                "I hesitate to try...",
+                "How to be sure it's not a scam?",
+                "I heard some rumors, is it reliable?",
+                "yes",
+                "You must wait 24h",
+                "I received yesterday, that's why I'm back",
+                "I'm afraid to lose my funds, any advice?",
+                "gg",
+                "Are winnings guaranteed?",
+                "Has anyone lost money here?",
+                "I'm new, is it worth it?",
+                "How exactly does the system work?",
+                "yes",
+                "I have doubts about the site's security...",
+                "asshole",
+                "I heard about withdrawal problems...",
+                "Can anyone confirm it works?",
+                "I don't understand why I haven't received yet...",
+                "no",
+                "I'm afraid it's a scam...",
+                "What's the real probability of winning?",
+                "50% chance",
+                "yesss?"
+            ];
+            
+            // General chat messages (doubled)
+            const generalMessages = [
+                "Here I go.",
+                "I think BTC will reach 100k this year!",
+                "Message forbidden!",
+                "yes",
+                "What's the maximum amount you can win?",
+                "I tried, we'll see if it's ok",
+                "I just started with Bitcoin, any advice?",
+                "And boom, won again!",
+                "Go for it with eyes closed!",
+                "Have you tried other Bitcoin games?",
+                "No",
+                "I think I just got the money :)",
+                "Put small amounts guys, be careful",
+                "Added the site to favorites!",
+                "Dick",
+                "Who else is playing here?",
+                "I just arrived, how does it work?",
+                "What's your winning record?",
+                "I didn't win.",
+                "How often do you play?",
+                "I'm addicted to this game!",
+                "Who won today?",
+                "I won for the first time!",
+                "The chat is active today!",
+                "2 days in a row!",
+                "and here we go, BTC for me",
+                "I just sent my BTC, fingers crossed!",
+                "Who's been playing here for a long time?",
+                "I recommend this game to everyone!",
+                "The site design is really great!"
+            ];
+            
+            // Check fields to enable Play button
+            function checkPlayButton() {
+                const pseudo = document.getElementById('pseudo').value;
+                const amount = amountInput.value;
+                const receiveAddress = document.getElementById('receive-address').value;
+                
+                // Reset errors
+                pseudoError.style.display = 'none';
+                addressError.style.display = 'none';
+                amountError.style.display = 'none';
+                
+                let isValid = true;
+                
+                if(!pseudo) {
+                    pseudoError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if(!receiveAddress) {
+                    addressError.style.display = 'block';
+                    isValid = false;
+                } else if(!validateBitcoinAddress(receiveAddress)) {
+                    addressError.textContent = "Invalid Bitcoin address";
+                    addressError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if(!amount || parseFloat(amount) < 0.0001 || parseFloat(amount) > 2) {
+                    amountError.textContent = "Amount must be between 0.0001 and 2 BTC";
+                    amountError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Check if address played recently
+                const lastPlayed = getCookie(receiveAddress);
+                if (lastPlayed) {
+                    const lastPlayedDate = new Date(parseInt(lastPlayed));
+                    const now = new Date();
+                    const hoursDiff = Math.abs(now - lastPlayedDate) / 36e5;
+                    
+                    if (hoursDiff < 24) {
+                        addressError.textContent = "This address played recently. You must wait 24h.";
+                        addressError.style.display = 'block';
+                        isValid = false;
+                    }
+                }
+                
+                if(isValid) {
+                    playBtn.disabled = false;
+                    playBtn.classList.remove('btn-disabled');
+                } else {
+                    playBtn.disabled = true;
+                    playBtn.classList.add('btn-disabled');
+                }
+            }
+            
+            // Simplified Bitcoin address validation
+            function validateBitcoinAddress(address) {
+                // Basic validation - more complex in reality
+                return address.length >= 26 && address.length <= 35 && 
+                      (address.startsWith('1') || address.startsWith('3') || address.startsWith('bc1'));
+            }
+            
+            // Cookie management functions
+            function setCookie(name, value, hours) {
+                let expires = "";
+                if (hours) {
+                    const date = new Date();
+                    date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
+            }
+            
+            function getCookie(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for(let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+            
+            // Play Button
+            playBtn.addEventListener('click', function() {
+                const pseudo = document.getElementById('pseudo').value;
+                const amount = amountInput.value;
+                const receiveAddress = document.getElementById('receive-address').value;
+                
+                if(!pseudo || !amount || !receiveAddress) {
+                    checkPlayButton();
+                    return;
+                }
+                
+                if(parseFloat(amount) < 0.0001 || parseFloat(amount) > 2) {
+                    amountError.textContent = "Amount must be between 0.0001 and 2 BTC";
+                    amountError.style.display = 'block';
+                    return;
+                }
+                
+                if(!validateBitcoinAddress(receiveAddress)) {
+                    addressError.textContent = "Invalid Bitcoin address";
+                    addressError.style.display = 'block';
+                    return;
+                }
+                
+                // Show game area
+                gameArea.style.display = 'block';
+                gameAmount.textContent = amount;
+                loseAmount.textContent = amount;
+                gameResultText.textContent = `Your bet: ${amount} BTC`;
+                
+                // Hide form
+                pseudoSection.style.display = 'none';
+                addressSection.style.display = 'none';
+                amountSection.style.display = 'none';
+                
+                // Show visitor info
+                infoPseudo.textContent = pseudo;
+                infoAddress.textContent = receiveAddress;
+                infoAmount.textContent = amount;
+                visitorInfo.style.display = 'block';
+                
+                // Scroll animation
+                gameArea.scrollIntoView({ behavior: 'smooth' });
+                
+                // Disable and hide Play button
+                playBtn.disabled = true;
+                playBtn.style.display = 'none';
+            });
+            
+            // Spin the slot machine
+            spinBtn.addEventListener('click', function() {
+                // Disable button during animation
+                spinBtn.disabled = true;
+                
+                // Possible symbols
+                const symbols = ["🍒", "💰", "🍀", "🔔", "⭐", "💎"];
+                
+                // Reels
+                const reels = [
+                    document.getElementById('reel-content1'),
+                    document.getElementById('reel-content2'),
+                    document.getElementById('reel-content3')
+                ];
+                
+                // Animation duration
+                const duration = 2000 + Math.random() * 2000;
+                const startTime = Date.now();
+                
+                // Determine result (50% chance to win)
+                const win = Math.random() > 0.5;
+                let finalSymbols = [];
+                
+                if(win) {
+                    // All symbols identical
+                    const winSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    finalSymbols = [winSymbol, winSymbol, winSymbol];
+                } else {
+                    // Different symbols
+                    finalSymbols = [
+                        symbols[Math.floor(Math.random() * symbols.length)],
+                        symbols[Math.floor(Math.random() * symbols.length)],
+                        symbols[Math.floor(Math.random() * symbols.length)]
+                    ];
+                }
+                
+                // Animation function
+                function animate() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Spin reels
+                    for(let i = 0; i < 3; i++) {
+                        // Final position based on chosen symbol
+                        const symbolIndex = symbols.indexOf(finalSymbols[i]);
+                        const targetPosition = symbolIndex * 100;
+                        
+                        // Smooth animation with easing
+                        const easeProgress = progress < 0.5 
+                            ? 2 * progress * progress 
+                            : -1 + (4 - 2 * progress) * progress;
+                        
+                        const offset = targetPosition + (1 - easeProgress) * 1000;
+                        reels[i].style.transform = `translateY(-${offset}px)`;
+                    }
+                    
+                    if(progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // Final stop
+                        for(let i = 0; i < 3; i++) {
+                            const symbolIndex = symbols.indexOf(finalSymbols[i]);
+                            const position = symbolIndex * 100;
+                            reels[i].style.transform = `translateY(-${position}px)`;
+                        }
+                        
+                        // Show result after delay
+                        setTimeout(() => {
+                            if(win) {
+                                showWinResult();
+                            } else {
+                                showLoseResult();
+                            }
+                        }, 500);
+                    }
+                }
+                
+                // Start animation
+                animate();
+                
+                // Hide "Spin" button
+                spinBtn.classList.add('hidden');
+            });
+            
+            // Show win result
+            function showWinResult() {
+                // Show result
+                const amount = amountInput.value;
+                const winAmountValue = parseFloat(amount) * 2;
+                winAmount.textContent = winAmountValue.toFixed(4);
+                totalWin.textContent = winAmountValue.toFixed(4);
+                sendAmount.textContent = amount;
+                gameResult.style.display = 'block';
+                
+                // Show BTC send section
+                setTimeout(() => {
+                    sendBtcSection.style.display = 'block';
+                    sendBtcSection.scrollIntoView({ behavior: 'smooth' });
+                }, 1000);
+            }
+            
+            // Show lose result
+            function showLoseResult() {
+                // Show lose result
+                loseResult.style.display = 'block';
+                
+                // After 2 seconds, show rating section
+                setTimeout(() => {
+                    ratingSection.style.display = 'block';
+                    ratingSection.scrollIntoView({ behavior: 'smooth' });
+                }, 2000);
+            }
+            
+            // Validate transfer
+            validateBtn.addEventListener('click', function() {
+                validateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validating...';
+                
+                setTimeout(() => {
+                    // Hide all game elements
+                    gameArea.style.display = 'none';
+                    gameResult.style.display = 'none';
+                    sendBtcSection.style.display = 'none';
+                    
+                    // Show thank you message
+                    thankYou.style.display = 'block';
+                    thankYou.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Add notification
+                    createNotification(
+                        document.getElementById('pseudo').value, 
+                        parseFloat(amountInput.value) * 2
+                    );
+                    
+                    // Store in cookies to prevent replay for 24h
+                    const receiveAddress = document.getElementById('receive-address').value;
+                    setCookie(receiveAddress, Date.now().toString(), 24);
+                    
+                    // After 3 seconds, show rating section
+                    setTimeout(() => {
+                        ratingSection.style.display = 'block';
+                        ratingSection.scrollIntoView({ behavior: 'smooth' });
+                    }, 3000);
+                }, 2000);
+            });
+            
+            // Rating stars management
+            ratingStars.querySelectorAll('i').forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    currentUserRating = rating;
+                    
+                    // Update stars display
+                    ratingStars.querySelectorAll('i').forEach((s, index) => {
+                        if(index < rating) {
+                            s.classList.remove('far');
+                            s.classList.add('fas', 'active');
+                        } else {
+                            s.classList.remove('fas', 'active');
+                            s.classList.add('far');
+                        }
+                    });
+                });
+            });
+            
+            // Submit rating
+            submitRatingBtn.addEventListener('click', function() {
+                if(currentUserRating === 0) {
+                    return;
+                }
+                
+                // Update global reviews
+                totalReviews++;
+                totalRating += currentUserRating;
+                const newAverage = totalRating / totalReviews;
+                
+                // Update reviews display
+                updateReviewsDisplay(newAverage);
+                
+                // Hide rating section
+                ratingSection.style.display = 'none';
+                
+                // Show confirmation message
+                createNotification(
+                    document.getElementById('pseudo').value, 
+                    "Thanks for your rating!"
+                );
+            });
+            
+            // Update global reviews display
+            function updateReviewsDisplay(average) {
+                // Update reviews count
+                totalVotes.textContent = `Based on ${totalReviews.toLocaleString('en')} reviews`;
+                
+                // Update average rating
+                overallRating.textContent = `${average.toFixed(1)}/5`;
+                
+                // Update stars
+                const stars = overallStars.querySelectorAll('i');
+                const fullStars = Math.floor(average);
+                const halfStar = (average - fullStars) >= 0.5;
+                
+                stars.forEach((star, index) => {
+                    if(index < fullStars) {
+                        star.className = 'fas fa-star';
+                    } else if(halfStar && index === fullStars) {
+                        star.className = 'fas fa-star-half-alt';
+                    } else {
+                        star.className = 'far fa-star';
+                    }
+                });
+            }
+            
+            // Add message to chat
+            function addChatMessage(username, content) {
+                const now = new Date();
+                const timestamp = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add('message-user');
+                messageElement.setAttribute('data-timestamp', Date.now());
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="username">${username}</span>
+                        <span class="timestamp">${timestamp}</span>
+                    </div>
+                    <div class="message-content">${content}</div>
+                `;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Add system message to chat
+            function addSystemMessage(content) {
+                const now = new Date();
+                const timestamp = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add('message-system');
+                messageElement.setAttribute('data-timestamp', Date.now());
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="username">System</span>
+                        <span class="timestamp">${timestamp}</span>
+                    </div>
+                    <div class="message-content">${content}</div>
+                `;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Clean up old chat messages
+            function cleanupOldMessages() {
+                const now = Date.now();
+                const messages = document.querySelectorAll('.message');
+                messages.forEach(msg => {
+                    const timestamp = parseInt(msg.getAttribute('data-timestamp'));
+                    if (now - timestamp > 60000) { // 1 minute
+                        msg.remove();
+                    }
+                });
+            }
+            
+            // Send chat message
+            sendBtn.addEventListener('click', function() {
+                const message = chatInput.value.trim();
+                const pseudo = document.getElementById('pseudo').value;
+                
+                if(message && pseudo) {
+                    addChatMessage(pseudo, message);
+                    chatInput.value = '';
+                    
+                    // Automatic random response (faster)
+                    setTimeout(() => {
+                        const randomResponse = getRandomResponse();
+                        const randomUser = pseudos[Math.floor(Math.random() * pseudos.length)];
+                        addChatMessage(randomUser, randomResponse);
+                    }, 3000 + Math.random() * 3000); // Fast responses
+                }
+            });
+            
+            // Send with Enter key
+            chatInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    sendBtn.click();
+                }
+            });
+            
+            // Get random chat response
+            function getRandomResponse() {
+                const random = Math.random();
+                
+                if(random < 0.4) {
+                    return positiveMessages[Math.floor(Math.random() * positiveMessages.length)];
+                } else if(random < 0.7) {
+                    return doubtMessages[Math.floor(Math.random() * doubtMessages.length)];
+                } else {
+                    return generalMessages[Math.floor(Math.random() * generalMessages.length)];
+                }
+            }
+            
+            // Create notification (in BTC)
+            function createNotification(username, amount) {
+                let content;
+                if(typeof amount === 'number') {
+                    // Ensure amount is even
+                    const evenAmount = Math.round(amount * 5000) / 5000;
+                    content = `${username} won ${evenAmount.toFixed(4)} BTC!`;
+                } else {
+                    content = `${username} ${amount}`;
+                }
+                
+                // Add visual notification
+                const notification = document.createElement('div');
+                notification.classList.add('notification');
+                
+                notification.innerHTML = `
+                    <div class="notification-header">
+                        <div class="notification-icon">
+                            <i class="fab fa-bitcoin"></i>
+                        </div>
+                        <div class="notification-title">Notification</div>
+                    </div>
+                    <div class="notification-content">
+                        ${content}
+                    </div>
+                `;
+                
+                notificationsContainer.appendChild(notification);
+                
+                // Add notification to system chat
+                addSystemMessage(content);
+                
+                // Remove notification after animation
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+            
+            // Generate random BTC notifications (less frequent)
+            function generateRandomNotification() {
+                const randomUser = pseudos[Math.floor(Math.random() * pseudos.length)];
+                // Generate even amount between 0.0002 and 2 BTC
+                const randomAmount = Math.round((Math.random() * 2 + 0.0002) * 10000) / 10000;
+                
+                createNotification(randomUser, randomAmount);
+                
+                // Schedule next notification (less frequent)
+                setTimeout(generateRandomNotification, 25000 + Math.random() * 25000);
+            }
+            
+            // Add initial chat messages (more frequent)
+            function initializeChat() {
+                // Add some initial messages
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const randomResponse = getRandomResponse();
+                        const randomUser = pseudos[Math.floor(Math.random() * pseudos.length)];
+                        addChatMessage(randomUser, randomResponse);
+                    }, i * 3000);
+                }
+                
+                // Continue adding messages regularly
+                setInterval(() => {
+                    const randomResponse = getRandomResponse();
+                    const randomUser = pseudos[Math.floor(Math.random() * pseudos.length)];
+                    addChatMessage(randomUser, randomResponse);
+                }, 25000 + Math.random() * 25000);
+            }
+            
+            // Start notifications and chat
+            setTimeout(generateRandomNotification, 3000);
+            initializeChat();
+            
+            // Initialize button and add event listeners
+            checkPlayButton();
+            document.getElementById('pseudo').addEventListener('input', checkPlayButton);
+            document.getElementById('receive-address').addEventListener('input', checkPlayButton);
+            amountInput.addEventListener('input', checkPlayButton);
+            
+            // Clean old messages every minute
+            setInterval(cleanupOldMessages, 60000);
+        });
+    </script>
+</body>
+</html>

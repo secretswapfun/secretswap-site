@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditions Générales - Bitcoin Quitte ou Double</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c1a30, #1a2a6c, #0f2027);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #2a5885;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #f7931a, #e2780d);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            grid-column: span 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .bitcoin-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2.5rem;
+            color: #f7931a;
+            animation: pulse 2s infinite;
+        }
+        
+        .slot-machine-icon {
+            font-size: 3rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .terms-container {
+            padding: 30px;
+            grid-column: span 1;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        
+        .terms-content {
+            background: rgba(30, 40, 70, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid #354b7a;
+            line-height: 1.6;
+        }
+        
+        .terms-title {
+            color: #f7931a;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f7931a;
+            font-size: 2rem;
+        }
+        
+        .section-title {
+            color: #f7931a;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f7931a;
+            font-size: 1.5rem;
+        }
+        
+        .terms-content p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .terms-content strong {
+            color: #f7931a;
+        }
+        
+        .terms-content ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .terms-content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            background: rgba(247, 147, 26, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid #f7931a;
+            margin: 20px 0;
+        }
+        
+        .warning {
+            background: rgba(231, 76, 60, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #e74c3c;
+            text-align: center;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid #2a5885;
+            grid-column: span 1;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                grid-column: span 1;
+            }
+            
+            .footer {
+                grid-column: span 1;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .terms-container {
+                padding: 15px;
+            }
+            
+            .terms-content {
+                padding: 20px;
+            }
+            
+            .terms-title {
+                font-size: 1.5rem;
+            }
+			        /* Arrêter la rotation du logo */
+.slot-machine-icon {
+    font-size: 7rem;
+    animation: pulse 2s infinite; /* Remplacement de l'animation spin par pulse */
+}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="slot-machine-icon">📜</div>
+            <div>
+                <h1>CONDITIONS GÉNÉRALES D'UTILISATION</h1>
+                <p> "QUITTE OU DOUBLE"</p>
+            </div>
+            <i class="fab fa-bitcoin bitcoin-icon"></i>
+        </div>
+        
+        <div class="terms-container">
+            <div class="terms-content">
+                <h2 class="terms-title">CONDITIONS GÉNÉRALES D'UTILISATION</h2>
+                <p><strong>"QUITTE OU DOUBLE"</strong></p>
+				<p>Retour au site </a></p>
+				<div class="slot-machine-icon"><a href="../"> 🎰</a></div>
+                
+                <h3 class="section-title">PRÉAMBULE</h3>
+                <p>En accédant à la présente plateforme (ci-après dénommée le "Site"), tout utilisateur (ci-après le "Joueur") reconnaît avoir pris pleinement connaissance des stipulations énoncées ci-dessous et s'engage irrévocablement à s'y conformer. Le Site constitue une œuvre d'art conceptuelle créée par un artiste (ci-après le "Créateur") dans le cadre d'une performance sociale explorant les interactions humaines, les mécanismes du hasard et les phénomènes liés aux cryptomonnaies. Aucune transaction réelle n'est autorisée ni envisagée.</p>
+                
+                <h3 class="section-title">ARTICLE 1 - CHAMP D'APPLICATION</h3>
+                <p><strong>1.1 Accessibilité Universelle</strong> : Le Site est accessible aux résidents de tout État, territoire ou juridiction mondiale, sous réserve du respect intégral des présentes conditions.</p>
+                <p><strong>1.2 Interdiction des Systèmes Automatisés</strong> : Tout recours à des robots, scripts, algorithmes ou dispositifs d'automatisation est strictement prohibé. Seuls des individus humains, physiquement et mentalement identifiables, sont autorisés à interagir avec le Site.</p>
+                <p><strong>1.3 Condition d'Âge</strong> : L'utilisation est réservée aux personnes majeures selon la législation applicable dans leur pays de résidence. La preuve de majorité peut être exigée à tout moment.</p>
+                
+                <h3 class="section-title">ARTICLE 2 - NATURE EXPÉRIMENTALE ET AVERTISSEMENTS</h3>
+                <p><strong>2.1 Simulation Artistique</strong> : Le Site est une installation numérique à vocation démonstrative et pédagogique. Il ne propose aucun jeu d'argent réel, ni gain monétaire légitime. Les cryptomonnaies évoquées sont fictives et n'ont aucune valeur marchande.</p>
+                
+                <div class="highlight">
+                    <p><strong>2.2 Risques Inhérents aux Jeux de Hasard</strong> : À titre préventif, le Créateur alerte les Joueurs sur les dangers associés aux jeux d'argent, notamment :</p>
+                    <ul>
+                        <li>Dépendance pathologique et troubles psychiatriques</li>
+                        <li>Détérioration des relations sociales et familiales</li>
+                        <li>Risques de surendettement et de ruine financière</li>
+                        <li>Implications légales dans les juridictions prohibant les jeux d'argent</li>
+                        <li>Altération de la santé mentale (dépression, anxiété, impulsivité)</li>
+                    </ul>
+                </div>
+                
+                <h3 class="section-title">ARTICLE 3 - DISCLAIMER DE RESPONSABILITÉ</h3>
+                <p><strong>3.1 Acceptation des Risques</strong> : Le Joueur utilise le Site à ses seuls périls et risques. Le Créateur décline toute responsabilité concernant :</p>
+                <ul>
+                    <li>Les pertes de temps ou d'opportunités liées à l'utilisation</li>
+                    <li>Tout préjudice moral, psychologique ou financier</li>
+                    <li>L'inexactitude ou l'obsolescence des contenus</li>
+                </ul>
+                <p><strong>3.2 Modifications Unilatérales</strong> : Le Créateur se réserve le droit de modifier, suspendre ou interrompre les conditions d'accès, mécanismes ou règles du Site sans préavis ni justification.</p>
+                
+                <h3 class="section-title">ARTICLE 4 - GARANTIES ET ENGAGEMENTS DU JOUEUR</h3>
+                <p><strong>4.1 État de Santé</strong> : Le Joueur déclare solennellement :</p>
+                <ul>
+                    <li>Être sain de corps et d'esprit lors de chaque accès au Site</li>
+                    <li>Ne présenter aucun trouble comportemental ou addiction aux jeux</li>
+                    <li>Comprendre la nature fictive et artistique de la plateforme</li>
+                </ul>
+                <p><strong>4.2 Acceptation Irrévocable</strong> : Toute interaction avec le Site vaut ratification expresse et inconditionnelle des présentes conditions.</p>
+                
+                <div class="warning">
+                    <h3 class="section-title">ARTICLE 5 - CLAUSE PÉNALE ET RENONCIATION AUX RECOURS</h3>
+                    <p><strong>5.1 Sanction Civile</strong> : Tout Joueur initiant une action judiciaire, une réclamation ou une procédure contentieuse à l'encontre du Créateur s'engage <em>de facto</em> à lui verser une indemnité forfaitaire de <strong>UN MILLION DE DOLLARS US (1 000 000 USD)</strong> à titre de clause pénale compensatoire. Cette somme couvrira les frais de défense, le préjudice moral et l'atteinte à l'intégrité artistique.</p>
+                    <p><strong>5.2 Renonciation</strong> : Le Joueur renonce explicitement à tout recours en responsabilité contractuelle, délictuelle ou autre, quel qu'en soit le fondement juridique.</p>
+                </div>
+                
+                <h3 class="section-title">ARTICLE 6 - DISPOSITIONS FINALES</h3>
+                <p><strong>6.1 Indépendance des Clauses</strong> : La nullité d'une disposition n'affecte pas la validité des autres.</p>
+                <p><strong>6.2 Loi Applicable</strong> : Les présentes conditions sont régies par les principes généraux du droit international, en dehors de tout système juridique national.</p>
+                
+                <div class="highlight">
+                    <h3 class="section-title">CONCLUSION</h3>
+                    <p><em>« En persistant dans la navigation, vous attestez avoir compris que ce Site est un miroir critique des illusions spéculatives, non un casino. Son essence est métaphorique : si vous y cherchez fortune, vous êtes déjà la dupe que l'artiste dénonce. »</em></p>
+                </div>
+                
+                <p style="text-align: right; margin-top: 30px; font-style: italic;">
+                    Fait pour être opposé en tout lieu et toute juridiction, le 13 juin 2025.<br>
+                    © Créateur de la Performance "Quitte ou Double" — Œuvre d'art sous licence conceptuelle.
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Simulation artistique - Ce site est une démonstration conceptuelle</p>
+            <p>© 2025 Bitcoin Quitte ou Double. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>
