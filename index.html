@@ -4,72 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecretSwap.fun - Exchange your secrets anonymously</title>
-    <script 
-  src="https://www.paypal.com/sdk/js?client-id=BAASqHmRUaw9JpJWNA3d0XElWNNDdRQdytHNxWDxEtZTz8gICMWyhyqiKfNtkbc4Q8-f2aYdN5VR_ailf8&components=hosted-buttons&disable-funding=venmo&currency=USD">
-</script>
-    <!-- Add TensorFlow.js and Toxicity model -->
+    <script src="https://www.paypal.com/sdk/js?client-id=BAASqHmRUaw9JpJWNA3d0XElWNNDdRQdytHNxWDxEtZTz8gICMWyhyqiKfNtkbc4Q8-f2aYdN5VR_ailf8&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
-        <link rel="stylesheet" href="style.css">
-    <style>
-  
-        
-        /* New moderation styles */
-        .moderation-message {
-            background-color: #ffebee;
-            border-left: 4px solid var(--danger);
-            padding: 15px;
-            border-radius: 0 8px 8px 0;
-            margin-top: 15px;
-            display: none;
-        }
-        
-        .toxicity-summary {
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .toxicity-bar {
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-        
-        .toxicity-level {
-            height: 100%;
-            background: var(--danger);
-            border-radius: 4px;
-        }
-        
-        .toxicity-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        
-        .model-status {
-            text-align: center;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 8px;
-            background-color: #e3f2fd;
-            color: #0d47a1;
-            display: none;
-        }
-        
-        .model-status.loaded {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-        }
-        
-        .model-status.error {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="model-status" id="modelStatus">
@@ -111,12 +49,12 @@
             <h2><span>2</span> Choose your emotion</h2>
             <div class="emotion-selector">
                 <button class="emotion-btn" data-emotion="😤" title="Excessive Pride - Feeling of superiority">😤</button>
-        <button class="emotion-btn" data-emotion="🤑" title="Greed - Obsessive desire for possessions">🤑</button>
-        <button class="emotion-btn" data-emotion="😒" title="Envy - Resentment of others' success">😒</button>
-        <button class="emotion-btn" data-emotion="😠" title="Wrath - Violent and destructive emotion">😠</button>
-        <button class="emotion-btn" data-emotion="😏" title="Lust - Uncontrollable desire">😏</button>
-        <button class="emotion-btn" data-emotion="😋" title="Gluttony - Excessive pursuit of pleasure">😋</button>
-        <button class="emotion-btn" data-emotion="😑" title="Sloth - Lack of energy and interest">😑</button>
+                <button class="emotion-btn" data-emotion="🤑" title="Greed - Obsessive desire for possessions">🤑</button>
+                <button class="emotion-btn" data-emotion="😒" title="Envy - Resentment of others' success">😒</button>
+                <button class="emotion-btn" data-emotion="😠" title="Wrath - Violent and destructive emotion">😠</button>
+                <button class="emotion-btn" data-emotion="😏" title="Lust - Uncontrollable desire">😏</button>
+                <button class="emotion-btn" data-emotion="😋" title="Gluttony - Excessive pursuit of pleasure">😋</button>
+                <button class="emotion-btn" data-emotion="😑" title="Sloth - Lack of energy and interest">😑</button>
             </div>
             <div class="error-message" id="emotionError">Please select an emotion</div>
         </div>
@@ -129,7 +67,7 @@
         </div>
     </div>
     
-    <div class="container" id="resultContainer" style="display: none;">
+    <div class="container" id="resultContainer">
         <h2 id="resultTitle">Here is a secret similar to yours:</h2>
         <div class="secret-result" id="secretResult">
             Loading your secret...
@@ -214,6 +152,52 @@
         </div>
     </div>
     
+    <div class="stats-container">
+        <h2>Community Secrets Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🤫</div>
+                <div class="stat-value" id="totalSecrets">0</div>
+                <div class="stat-label">Total Secrets</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😤</div>
+                <div class="stat-value" id="emotion1">0</div>
+                <div class="stat-label">Excessive Pride</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🤑</div>
+                <div class="stat-value" id="emotion2">0</div>
+                <div class="stat-label">Greed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😒</div>
+                <div class="stat-value" id="emotion3">0</div>
+                <div class="stat-label">Envy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😠</div>
+                <div class="stat-value" id="emotion4">0</div>
+                <div class="stat-label">Wrath</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😏</div>
+                <div class="stat-value" id="emotion5">0</div>
+                <div class="stat-label">Lust</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😋</div>
+                <div class="stat-value" id="emotion6">0</div>
+                <div class="stat-label">Gluttony</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😑</div>
+                <div class="stat-value" id="emotion7">0</div>
+                <div class="stat-label">Sloth</div>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <h2>Your secrets are safe</h2>
         <div class="features">
@@ -258,8 +242,8 @@
     </footer>
 
     <script>
-        // Configuration - MISE À JOUR AVEC VOTRE URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwImKJv3LVovbVlQ3pVV99oBqYIXRCMm4FjKFcHK9lHxiBdhm-idtCfOWQjYTf49Jc5ww/exec";
+        // Configuration
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDhDfjo9rPdoD36ki8ofSvvjLECfnrh2gk9XBgmYoZtJ5JABKYqHM_ofHdGO7mjFO_Ig/exec";
         
         // DOM Elements
         const secretInput = document.getElementById('secretInput');
@@ -288,6 +272,14 @@
         const modelStatus = document.getElementById('modelStatus');
         const moderationMessage = document.getElementById('moderationMessage');
         const toxicityLevel = document.getElementById('toxicityLevel');
+        const totalSecrets = document.getElementById('totalSecrets');
+        const emotion1 = document.getElementById('emotion1');
+        const emotion2 = document.getElementById('emotion2');
+        const emotion3 = document.getElementById('emotion3');
+        const emotion4 = document.getElementById('emotion4');
+        const emotion5 = document.getElementById('emotion5');
+        const emotion6 = document.getElementById('emotion6');
+        const emotion7 = document.getElementById('emotion7');
         
         let selectedEmotion = null;
         let currentRowId = null;
@@ -299,16 +291,11 @@
         async function initToxicityModel() {
             try {
                 modelStatus.style.display = 'block';
-                
-                // The minimum prediction confidence (0 = zero tolerance)
                 const threshold = 0.01;
-                
-                // Load the toxicity model
                 toxicityModel = await toxicity.load(threshold, [
                     'toxicity', 'severe_toxicity', 'identity_attack', 
                     'insult', 'threat', 'sexual_explicit'
                 ]);
-                
                 modelStatus.textContent = "Content moderation model loaded successfully";
                 modelStatus.classList.add('loaded');
             } catch (error) {
@@ -321,39 +308,32 @@
         // Check if text contains code
         function containsCode(text) {
             const codePatterns = [
-                /<[a-z][\s\S]*>/i, // HTML tags
-                /function\s*\(|=>|\/\/|\.\w+\(|var\s+\w+\s*=|const\s+\w+\s*=|let\s+\w+\s*=/i, // JavaScript
-                /\b(?:import|from|require|export|module\.exports|def\s+\w+\s*\(|class\s+\w+)\b/i, // Other languages
-                /(?:\b\w+\s*=\s*[\s\S]*?;)|(?:\{\s*[\s\S]*?\})|(?:\(\s*[\s\S]*?\))/ // Code structures
+                /<[a-z][\s\S]*>/i,
+                /function\s*\(|=>|\/\/|\.\w+\(|var\s+\w+\s*=|const\s+\w+\s*=|let\s+\w+\s*=/i,
+                /\b(?:import|from|require|export|module\.exports|def\s+\w+\s*\(|class\s+\w+)\b/i,
+                /(?:\b\w+\s*=\s*[\s\S]*?;)|(?:\{\s*[\s\S]*?\})|(?:\(\s*[\s\S]*?\))/
             ];
-            
             return codePatterns.some(pattern => pattern.test(text));
         }
         
         // Check text for toxicity
         async function isToxic(text) {
             if (!toxicityModel) return false;
-            
             try {
                 const predictions = await toxicityModel.classify(text);
                 let maxScore = 0;
-                
-                // Check all predictions
                 for (const prediction of predictions) {
                     if (prediction.results[0].match) {
                         const score = prediction.results[0].probabilities[1];
                         if (score > maxScore) maxScore = score;
                     }
                 }
-                
-                // Visual representation of toxicity
                 if (maxScore > 0) {
                     toxicityLevel.style.width = `${Math.min(100, maxScore * 100)}%`;
                     moderationMessage.style.display = 'block';
                 } else {
                     moderationMessage.style.display = 'none';
                 }
-                
                 return maxScore > 0;
             } catch (error) {
                 console.error("Toxicity classification error:", error);
@@ -365,30 +345,17 @@
         secretInput.addEventListener('input', () => {
             const text = secretInput.value;
             charCount.textContent = text.length;
-            
-            // Validate length
-            if (text.length < 100) {
-                lengthError.style.display = 'block';
-            } else {
-                lengthError.style.display = 'none';
-            }
-            
-            // Enable/disable submit button
+            lengthError.style.display = text.length < 100 ? 'block' : 'none';
             updateSubmitButton();
         });
         
         // Emotion selection
         emotionBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Remove previous selection
                 emotionBtns.forEach(b => b.classList.remove('selected'));
-                
-                // Select new emotion
                 btn.classList.add('selected');
                 selectedEmotion = btn.dataset.emotion;
                 emotionError.style.display = 'none';
-                
-                // Update submit button
                 updateSubmitButton();
             });
         });
@@ -396,124 +363,63 @@
         // Update submit button state
         function updateSubmitButton() {
             const text = secretInput.value;
-            if (text.length >= 100 && text.length <= 500 && selectedEmotion) {
-                submitBtn.disabled = false;
-            } else {
-                submitBtn.disabled = true;
-            }
+            submitBtn.disabled = !(text.length >= 100 && text.length <= 500 && selectedEmotion);
         }
         
         // Submit secret with moderation
         submitBtn.addEventListener('click', async () => {
             const secret = secretInput.value;
+            if (secret.length < 100) return lengthError.style.display = 'block';
+            if (!selectedEmotion) return emotionError.style.display = 'block';
             
-            // Validate inputs
-            if (secret.length < 100) {
-                lengthError.style.display = 'block';
-                return;
-            }
-            
-            if (!selectedEmotion) {
-                emotionError.style.display = 'block';
-                return;
-            }
-            
-            // Hide any previous moderation messages
             moderationMessage.style.display = 'none';
-            
-            // Show loading indicator
             loading.style.display = 'block';
             submitBtn.disabled = true;
             
             try {
-                // Check for code
-                if (containsCode(secret)) {
-                    throw new Error("Code detected in secret. Please remove any code and try again.");
-                }
+                if (containsCode(secret)) throw new Error("Code detected in secret. Please remove any code and try again.");
+                if (await isToxic(secret)) throw new Error("Inappropriate content detected. Please rephrase your secret.");
                 
-                // Check for toxicity
-                const toxic = await isToxic(secret);
-                if (toxic) {
-                    throw new Error("Inappropriate content detected. Please rephrase your secret.");
-                }
-                
-                // If all checks pass, send data to Google Sheets
-                const response = await fetch(
-                    `${SCRIPT_URL}?action=addSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`
-                );
-                
-                if (!response.ok) {
-                    throw new Error('Failed to save secret');
-                }
+                const response = await fetch(`${SCRIPT_URL}?action=addSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`);
+                if (!response.ok) throw new Error('Failed to save secret');
                 
                 const saveResult = await response.json();
-                if (saveResult.status !== 'success') {
-                    throw new Error(saveResult.message || 'Error saving secret');
-                }
+                if (saveResult.status !== 'success') throw new Error(saveResult.message || 'Error saving secret');
                 
-                // Now get a random secret with the same emotion
-                const secretResponse = await fetch(
-                    `${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`
-                );
-                
-                if (!secretResponse.ok) {
-                    throw new Error('Failed to retrieve secret');
-                }
+                const secretResponse = await fetch(`${SCRIPT_URL}?action=getRandomSecret&emotion=${selectedEmotion}`);
+                if (!secretResponse.ok) throw new Error('Failed to retrieve secret');
                 
                 const secretData = await secretResponse.json();
-                
-                // Hide loading
                 loading.style.display = 'none';
-                
-                // Hide the form container
                 secretFormContainer.style.display = 'none';
-                
-                // Show the result container
                 resultContainer.style.display = 'block';
                 
                 if (secretData.status === "no_secret") {
-                    // No secret found for this emotion
                     resultTitle.textContent = "You're the first with this emotion!";
                     secretResult.textContent = "Share your secret to start the exchange. As soon as another person shares a similar secret, you'll receive it.";
                     actionsContainer.style.display = 'none';
                 } else {
-                    // Show the retrieved secret
                     secretResult.textContent = secretData.secret;
                     currentRowId = secretData.rowId;
-                    resultTitle.textContent = "Here is a secret similar to yours:";
                     actionsContainer.style.display = 'flex';
                 }
                 
-                // Reset form (but keep it hidden)
                 secretInput.value = '';
                 charCount.textContent = '0';
                 emotionBtns.forEach(b => b.classList.remove('selected'));
                 selectedEmotion = null;
                 submitBtn.disabled = true;
-                
-                // Reset action buttons
                 actionBtns.forEach(b => b.disabled = false);
                 actionTaken = false;
-                
-                // Hide PayPal container initially
                 paypalContainer.style.display = 'none';
-                
-                // Hide stats display
                 statsDisplay.style.display = 'none';
-                
-                // Hide thank you message
                 thankYouMessage.style.display = 'none';
-                
-                // Scroll to result
                 resultContainer.scrollIntoView({ behavior: 'smooth' });
-                
-                // Load revealed secrets
                 loadRevealedSecrets();
+                loadStats();
             } catch (error) {
                 loading.style.display = 'none';
                 submitBtn.disabled = false;
-                
-                // Show error message
                 if (error.message.includes("Inappropriate") || error.message.includes("Code detected")) {
                     moderationMessage.querySelector('p').textContent = error.message;
                     moderationMessage.style.display = 'block';
@@ -527,67 +433,39 @@
         actionBtns.forEach(btn => {
             btn.addEventListener('click', async () => {
                 if (actionTaken) return;
-                
                 const action = btn.dataset.action;
                 actionTaken = true;
-                
-                // Disable all action buttons
                 actionBtns.forEach(b => b.disabled = true);
                 
                 try {
-                    // Send request to increment counter
-                    const response = await fetch(
-                        `${SCRIPT_URL}?action=increment&rowId=${currentRowId}&counterType=${action}`
-                    );
-                    
-                    if (!response.ok) {
-                        throw new Error('Failed to update counter');
-                    }
+                    const response = await fetch(`${SCRIPT_URL}?action=increment&rowId=${currentRowId}&counterType=${action}`);
+                    if (!response.ok) throw new Error('Failed to update counter');
                     
                     const result = await response.json();
-                    if (result.status !== 'success') {
-                        throw new Error(result.message || 'Error updating counter');
-                    }
+                    if (result.status !== 'success') throw new Error(result.message || 'Error updating counter');
                     
-                    // Get updated stats for this secret
-                    const statsResponse = await fetch(
-                        `${SCRIPT_URL}?action=getSecretStats&rowId=${currentRowId}`
-                    );
-                    
-                    if (!statsResponse.ok) {
-                        throw new Error('Failed to get updated stats');
-                    }
+                    const statsResponse = await fetch(`${SCRIPT_URL}?action=getSecretStats&rowId=${currentRowId}`);
+                    if (!statsResponse.ok) throw new Error('Failed to get updated stats');
                     
                     const statsData = await statsResponse.json();
                     if (statsData.status === 'success') {
-                        // Update local stats
                         secretStats.keep = statsData.keep;
                         secretStats.forget = statsData.forget;
                         secretStats.support = statsData.support;
                         secretStats.reveal = statsData.reveal;
-                        
-                        // Show stats display
                         updateStatsDisplay();
                         statsDisplay.style.display = 'block';
                     }
                     
-                    // Show PayPal container only for Reveal action
                     if (action === 'reveal') {
                         paypalContainer.style.display = 'block';
-                        
-                        // Initialize PayPal button
                         paypal.HostedButtons({
                             hostedButtonId: "DKK8KM24TAJRE",
                         }).render("#paypal-container-DKK8KM24TAJRE");
                     }
                     
-                    // Show thank you message
                     thankYouMessage.style.display = 'block';
-                    
-                    // If action is reveal, reload revealed secrets
-                    if (action === 'reveal') {
-                        loadRevealedSecrets();
-                    }
+                    if (action === 'reveal') loadRevealedSecrets();
                 } catch (error) {
                     alert("Error: " + error.message);
                     actionBtns.forEach(b => b.disabled = false);
@@ -618,21 +496,16 @@
             
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getRevealedSecrets`);
-                
-                if (!response.ok) {
-                    throw new Error('Failed to load revealed secrets');
-                }
+                if (!response.ok) throw new Error('Failed to load revealed secrets');
                 
                 const data = await response.json();
-                
                 if (data.status === "success" && data.secrets && data.secrets.length > 0) {
                     data.secrets.forEach(secret => {
-                        const secretCard = createSecretCard(secret);
-                        revealedSecretsGrid.appendChild(secretCard);
+                        revealedSecretsGrid.appendChild(createSecretCard(secret));
                     });
                 } else {
                     revealedSecretsGrid.innerHTML = `
-                        <div class="no-secrets" style="text-align: center; grid-column: 1 / -1; padding: 40px;">
+                        <div class="no-secrets">
                             <h3>No secrets revealed yet</h3>
                             <p>Be the first to reveal a secret that resonates with others!</p>
                         </div>
@@ -640,7 +513,7 @@
                 }
             } catch (error) {
                 revealedSecretsGrid.innerHTML = `
-                    <div class="error" style="text-align: center; grid-column: 1 / -1; padding: 40px; color: var(--coral);">
+                    <div class="error">
                         <h3>Error loading secrets</h3>
                         <p>${error.message}</p>
                     </div>
@@ -654,7 +527,6 @@
         function createSecretCard(secret) {
             const card = document.createElement('div');
             card.className = 'secret-card';
-            
             card.innerHTML = `
                 <div class="secret-emotion">${secret.emotion}</div>
                 <div class="secret-content">${secret.secret}</div>
@@ -677,26 +549,39 @@
                     </div>
                 </div>
             `;
-            
             return card;
+        }
+        
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getStats`);
+                if (!response.ok) throw new Error('Failed to load stats');
+                const data = await response.json();
+                if (data.status !== 'success') throw new Error(data.message);
+                
+                totalSecrets.textContent = data.total;
+                emotion1.textContent = data.byEmotion['😤'] || 0;
+                emotion2.textContent = data.byEmotion['🤑'] || 0;
+                emotion3.textContent = data.byEmotion['😒'] || 0;
+                emotion4.textContent = data.byEmotion['😠'] || 0;
+                emotion5.textContent = data.byEmotion['😏'] || 0;
+                emotion6.textContent = data.byEmotion['😋'] || 0;
+                emotion7.textContent = data.byEmotion['😑'] || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
         }
         
         // Initial load
         document.addEventListener('DOMContentLoaded', async () => {
-            // Initialize toxicity model
             await initToxicityModel();
-            
             loadRevealedSecrets();
-            
-            // Update character count on page load
             charCount.textContent = secretInput.value.length;
             updateSubmitButton();
-            
-            // Hide the result container initially
             resultContainer.style.display = 'none';
-            
-            // Hide PayPal container initially
             paypalContainer.style.display = 'none';
+            loadStats();
         });
     </script>
 </body>
