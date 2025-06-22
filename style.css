@@ -665,14 +665,16 @@
         }
         
         .paypal-container {
-            display: none;
-            width: 100%;
-            text-align: center;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(20, 20, 40, 0.5);
-            border-radius: 10px;
-            border: 1px solid rgba(148, 93, 156, 0.3);
+             display: none;
+    width: 100%; /* Conserve la largeur totale */
+    max-width: 600px; /* Ajoute une largeur maximale pour éviter l'étirement excessif */
+    margin: 20px auto; /* Centre horizontalement avec marges automatiques */
+    padding: 20px;
+    text-align: center; /* Centre le contenu interne */
+    background: rgba(20, 20, 40, 0.5);
+    border-radius: 10px;
+    border: 1px solid rgba(148, 93, 156, 0.3);
+    box-sizing: border-box; /* Inclut padding/border dans la largeur */
         }
         
         .paypal-text {
