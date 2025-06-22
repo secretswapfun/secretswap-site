@@ -33,16 +33,16 @@
             <div class="char-count"><span id="charCount">0</span>/500 characters</div>
             <div class="error-message" id="lengthError">Secret must be at least 100 characters long</div>
             <div class="moderation-message" id="moderationMessage">
-                <div class="toxicity-summary">Inappropriate content detected</div>
-                <p>Your secret contains toxic language or code. Please rephrase your message.</p>
-                <div class="toxicity-bar">
-                    <div class="toxicity-level" id="toxicityLevel"></div>
-                </div>
-                <div class="toxicity-labels">
-                    <span>Safe</span>
-                    <span>Toxic</span>
-                </div>
-            </div>
+    <div class="toxicity-summary">Inappropriate content detected</div>
+    <p>Your secret contains toxic language or code (<span class="toxicity-percent">0%</span>). Please rephrase your message.</p>
+    <div class="toxicity-bar">
+        <div class="toxicity-level" id="toxicityLevel"></div>
+    </div>
+    <div class="toxicity-labels">
+        <span>Safe</span>
+        <span>Toxic</span>
+    </div>
+</div>
         </div>
         
         <div class="step">
@@ -287,23 +287,27 @@
         let secretStats = { keep: 0, forget: 0, support: 0, reveal: 0 };
         let toxicityModel = null;
         
-        // Initialize toxicity model
-        async function initToxicityModel() {
-            try {
-                modelStatus.style.display = 'block';
-                const threshold = 0.01;
-                toxicityModel = await toxicity.load(threshold, [
-                    'toxicity', 'severe_toxicity', 'identity_attack', 
-                    'insult', 'threat', 'sexual_explicit'
-                ]);
-                modelStatus.textContent = "Content moderation model loaded successfully";
-                modelStatus.classList.add('loaded');
-            } catch (error) {
-                modelStatus.textContent = "Error loading moderation model: " + error.message;
-                modelStatus.classList.add('error');
-                console.error("Toxicity model error:", error);
-            }
+           // Initialize toxicity model with higher threshold
+    async function initToxicityModel() {
+        try {
+            modelStatus.style.display = 'block';
+            // Augmentation du seuil de tolérance (0.5 au lieu de 0.01)
+            const threshold = 0.5;
+            toxicityModel = await toxicity.load(threshold, [
+                'toxicity', 'severe_toxicity', 'identity_attack', 
+                'insult', 'threat', 'sexual_explicit'
+            ]);
+            
+            // Faire disparaître le message après chargement
+            setTimeout(() => {
+                modelStatus.style.display = 'none';
+            }, 1500);
+        } catch (error) {
+            modelStatus.textContent = "Error loading moderation model: " + error.message;
+            modelStatus.classList.add('error');
+            console.error("Toxicity model error:", error);
         }
+    }
         
         // Check if text contains code
         function containsCode(text) {
@@ -316,30 +320,35 @@
             return codePatterns.some(pattern => pattern.test(text));
         }
         
-        // Check text for toxicity
-        async function isToxic(text) {
-            if (!toxicityModel) return false;
-            try {
-                const predictions = await toxicityModel.classify(text);
-                let maxScore = 0;
-                for (const prediction of predictions) {
-                    if (prediction.results[0].match) {
-                        const score = prediction.results[0].probabilities[1];
-                        if (score > maxScore) maxScore = score;
-                    }
+    // Check text for toxicity
+    async function isToxic(text) {
+        if (!toxicityModel) return { isToxic: false, maxScore: 0 };
+        try {
+            const predictions = await toxicityModel.classify(text);
+            let maxScore = 0;
+            for (const prediction of predictions) {
+                if (prediction.results[0].match) {
+                    const score = prediction.results[0].probabilities[1];
+                    if (score > maxScore) maxScore = score;
                 }
-                if (maxScore > 0) {
-                    toxicityLevel.style.width = `${Math.min(100, maxScore * 100)}%`;
-                    moderationMessage.style.display = 'block';
-                } else {
-                    moderationMessage.style.display = 'none';
-                }
-                return maxScore > 0;
-            } catch (error) {
-                console.error("Toxicity classification error:", error);
-                return false;
             }
+            
+            // Afficher le pourcentage de toxicité
+            if (maxScore > 0) {
+                const toxicityPercent = Math.min(100, Math.round(maxScore * 100));
+                toxicityLevel.style.width = `${toxicityPercent}%`;
+                document.querySelector('.toxicity-percent').textContent = `${toxicityPercent}%`;
+                moderationMessage.style.display = 'block';
+            } else {
+                moderationMessage.style.display = 'none';
+            }
+            
+            return { isToxic: maxScore > 0, maxScore };
+        } catch (error) {
+            console.error("Toxicity classification error:", error);
+            return { isToxic: false, maxScore: 0 };
         }
+    }
         
         // Update character counter
         secretInput.addEventListener('input', () => {

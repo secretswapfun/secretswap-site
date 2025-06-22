@@ -873,7 +873,7 @@ footer a:hover {
 }
 
 .moderation-message {
-    background-color: #ffebee;
+  
     border-left: 4px solid var(--danger);
     padding: 15px;
     border-radius: 0 8px 8px 0;
@@ -969,6 +969,20 @@ footer a:hover {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+/* Ajouter ceci dans style.css */
+.toxicity-percent {
+    font-weight: bold;
+    color: #ff4757;
+}
+
+.model-status {
+    transition: opacity 0.5s ease;
+}
+
+.model-status.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 @media (max-width: 480px) {
