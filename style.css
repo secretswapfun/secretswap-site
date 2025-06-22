@@ -515,7 +515,7 @@ h2 span {
 }
 
 .stats-container {
-    display: flex;
+    
     justify-content: space-around;
     margin-top: 15px;
 }
