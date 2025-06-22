@@ -7,9 +7,76 @@
     <script 
   src="https://www.paypal.com/sdk/js?client-id=BAASqHmRUaw9JpJWNA3d0XElWNNDdRQdytHNxWDxEtZTz8gICMWyhyqiKfNtkbc4Q8-f2aYdN5VR_ailf8&components=hosted-buttons&disable-funding=venmo&currency=USD">
 </script>
-    <link rel="stylesheet" href="style.css">
+    <!-- Add TensorFlow.js and Toxicity model -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
+        <link rel="stylesheet" href="style.css">
+    <style>
+  
+        
+        /* New moderation styles */
+        .moderation-message {
+            background-color: #ffebee;
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .toxicity-summary {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .toxicity-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .toxicity-level {
+            height: 100%;
+            background: var(--danger);
+            border-radius: 4px;
+        }
+        
+        .toxicity-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .model-status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            display: none;
+        }
+        
+        .model-status.loaded {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .model-status.error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
 </head>
 <body>
+    <div class="model-status" id="modelStatus">
+        <div class="spinner"></div>
+        Loading content moderation model...
+    </div>
+    
     <header>
         <div class="logo">
             <div class="logo-icon">🤫</div>
@@ -27,6 +94,17 @@
                 placeholder="Write what's on your mind... (min 100, max 500 characters)"></textarea>
             <div class="char-count"><span id="charCount">0</span>/500 characters</div>
             <div class="error-message" id="lengthError">Secret must be at least 100 characters long</div>
+            <div class="moderation-message" id="moderationMessage">
+                <div class="toxicity-summary">Inappropriate content detected</div>
+                <p>Your secret contains toxic language or code. Please rephrase your message.</p>
+                <div class="toxicity-bar">
+                    <div class="toxicity-level" id="toxicityLevel"></div>
+                </div>
+                <div class="toxicity-labels">
+                    <span>Safe</span>
+                    <span>Toxic</span>
+                </div>
+            </div>
         </div>
         
         <div class="step">
@@ -151,6 +229,11 @@
                 <h3>Caring community</h3>
                 <p>A judgment-free space to free yourself.</p>
             </div>
+            <div class="feature">
+                <div class="feature-icon">🛡️</div>
+                <h3>Content moderation</h3>
+                <p>All secrets are checked for inappropriate content.</p>
+            </div>
         </div>
     </div>
     
@@ -199,11 +282,81 @@
         const supportStat = document.getElementById('supportStat');
         const revealStat = document.getElementById('revealStat');
         const restartBtn = document.getElementById('restartBtn');
+        const modelStatus = document.getElementById('modelStatus');
+        const moderationMessage = document.getElementById('moderationMessage');
+        const toxicityLevel = document.getElementById('toxicityLevel');
         
         let selectedEmotion = null;
         let currentRowId = null;
         let actionTaken = false;
         let secretStats = { keep: 0, forget: 0, support: 0, reveal: 0 };
+        let toxicityModel = null;
+        
+        // Initialize toxicity model
+        async function initToxicityModel() {
+            try {
+                modelStatus.style.display = 'block';
+                
+                // The minimum prediction confidence (0 = zero tolerance)
+                const threshold = 0.01;
+                
+                // Load the toxicity model
+                toxicityModel = await toxicity.load(threshold, [
+                    'toxicity', 'severe_toxicity', 'identity_attack', 
+                    'insult', 'threat', 'sexual_explicit'
+                ]);
+                
+                modelStatus.textContent = "Content moderation model loaded successfully";
+                modelStatus.classList.add('loaded');
+            } catch (error) {
+                modelStatus.textContent = "Error loading moderation model: " + error.message;
+                modelStatus.classList.add('error');
+                console.error("Toxicity model error:", error);
+            }
+        }
+        
+        // Check if text contains code
+        function containsCode(text) {
+            const codePatterns = [
+                /<[a-z][\s\S]*>/i, // HTML tags
+                /function\s*\(|=>|\/\/|\.\w+\(|var\s+\w+\s*=|const\s+\w+\s*=|let\s+\w+\s*=/i, // JavaScript
+                /\b(?:import|from|require|export|module\.exports|def\s+\w+\s*\(|class\s+\w+)\b/i, // Other languages
+                /(?:\b\w+\s*=\s*[\s\S]*?;)|(?:\{\s*[\s\S]*?\})|(?:\(\s*[\s\S]*?\))/ // Code structures
+            ];
+            
+            return codePatterns.some(pattern => pattern.test(text));
+        }
+        
+        // Check text for toxicity
+        async function isToxic(text) {
+            if (!toxicityModel) return false;
+            
+            try {
+                const predictions = await toxicityModel.classify(text);
+                let maxScore = 0;
+                
+                // Check all predictions
+                for (const prediction of predictions) {
+                    if (prediction.results[0].match) {
+                        const score = prediction.results[0].probabilities[1];
+                        if (score > maxScore) maxScore = score;
+                    }
+                }
+                
+                // Visual representation of toxicity
+                if (maxScore > 0) {
+                    toxicityLevel.style.width = `${Math.min(100, maxScore * 100)}%`;
+                    moderationMessage.style.display = 'block';
+                } else {
+                    moderationMessage.style.display = 'none';
+                }
+                
+                return maxScore > 0;
+            } catch (error) {
+                console.error("Toxicity classification error:", error);
+                return false;
+            }
+        }
         
         // Update character counter
         secretInput.addEventListener('input', () => {
@@ -247,7 +400,7 @@
             }
         }
         
-        // Submit secret
+        // Submit secret with moderation
         submitBtn.addEventListener('click', async () => {
             const secret = secretInput.value;
             
@@ -262,12 +415,26 @@
                 return;
             }
             
+            // Hide any previous moderation messages
+            moderationMessage.style.display = 'none';
+            
             // Show loading indicator
             loading.style.display = 'block';
             submitBtn.disabled = true;
             
             try {
-                // Send data to Google Sheets
+                // Check for code
+                if (containsCode(secret)) {
+                    throw new Error("Code detected in secret. Please remove any code and try again.");
+                }
+                
+                // Check for toxicity
+                const toxic = await isToxic(secret);
+                if (toxic) {
+                    throw new Error("Inappropriate content detected. Please rephrase your secret.");
+                }
+                
+                // If all checks pass, send data to Google Sheets
                 const response = await fetch(
                     `${SCRIPT_URL}?action=addSecret&secret=${encodeURIComponent(secret)}&emotion=${selectedEmotion}`
                 );
@@ -342,7 +509,14 @@
             } catch (error) {
                 loading.style.display = 'none';
                 submitBtn.disabled = false;
-                alert("An error occurred: " + error.message);
+                
+                // Show error message
+                if (error.message.includes("Inappropriate") || error.message.includes("Code detected")) {
+                    moderationMessage.querySelector('p').textContent = error.message;
+                    moderationMessage.style.display = 'block';
+                } else {
+                    alert("An error occurred: " + error.message);
+                }
             }
         });
         
@@ -505,7 +679,10 @@
         }
         
         // Initial load
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize toxicity model
+            await initToxicityModel();
+            
             loadRevealedSecrets();
             
             // Update character count on page load
