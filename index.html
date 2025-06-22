@@ -286,39 +286,37 @@
     let secretStats = { keep: 0, forget: 0, support: 0, reveal: 0 };
     let toxicityModel = null;
     
-    // Vérification de code (version optimisée)
+    // Improved code detection (less sensitive)
     function containsCode(text) {
-        // Patterns spécifiques uniquement pour code visible
+        // Only look for actual code patterns
         const patterns = [
-            /<[a-z][\s\S]*>/i,                         // Balises HTML
-            /function\s*\([^)]*\)\s*\{/,               // Déclaration fonction
-            /(?:^|\s)(var|let|const)\s+\w+\s*=[^;]+;/,  // Variables JS
-            /\.\w+\([^)]*\)/,                          // Appels méthode
-            /\/\/|\/\*[\s\S]*?\*\//,                   // Commentaires
-            /(?:^|\s)(if|for|while|switch)\s*\(/,      // Structures contrôle
-            /(?:^|\s)(def|class)\s+\w+\s*\(?/,         // Python
-            /(?:^|\s)(import|from|require|export)\s+/, // Imports
-            /console\.log\(|alert\(|document\./i        // Fonctions spécifiques
+            /<[a-z][\s\S]*>/i,                         // HTML tags
+            /function\s*\([^)]*\)\s*\{[^}]*\}/,        // Function declarations with body
+            /(?:^|\s)(var|let|const)\s+\w+\s*=\s*[^;]+;/,  // JS variable assignments
+            /\.\w+\([^)]*\)\s*;?/,                     // Method calls
+            /(?:^|\s)(if|for|while|switch)\s*\([^)]*\)\s*\{/, // Control structures
+            /(?:^|\s)(def|class)\s+\w+\s*\(?[^)]*\)?\s*:/,  // Python code
+            /console\.log\(|alert\(|document\.\w+/i     // Specific JS functions
         ];
         
-        // Exclure les faux positifs courants
+        // Common false positives to ignore
         const falsePositives = [
-            /\([^)]{0,20}\)/,                     // Parenthèses courtes
-            /[a-z]\.(com|org|net)/i,              // Domaines internet
-            /:\/\/|www\./,                        // URLs
-            /=>|->|\+\+|--/                       // Symboles communs
+            /\([^)]{0,50}\)/,                     // Short parentheses
+            /[a-z]\.(com|org|net)/i,              // Internet domains
+            /:\/\/|www\.|http:\/\/|https:\/\//,   // URLs
+            /=>|->|\+\+|--|&&|\|\|/               // Common symbols
         ];
         
-        // Vérifier les patterns de code
+        // Check for code patterns
         const hasCode = patterns.some(pattern => pattern.test(text));
         
-        // Vérifier les faux positifs
+        // Check for false positives
         const hasFalsePositive = falsePositives.some(pattern => pattern.test(text));
         
         return hasCode && !hasFalsePositive;
     }
     
-    // Initialisation modèle de toxicité
+    // Initialize toxicity model
     async function initToxicityModel() {
         try {
             modelStatus.style.display = 'block';
@@ -331,13 +329,13 @@
                 modelStatus.style.display = 'none';
             }, 1500);
         } catch (error) {
-            modelStatus.textContent = "Modération désactivée: " + error.message;
+            modelStatus.textContent = "Moderation disabled: " + error.message;
             modelStatus.classList.add('error');
-            console.warn("Modération désactivée:", error);
+            console.warn("Moderation disabled:", error);
         }
     }
     
-    // Vérification toxicité
+    // Check for toxicity
     async function isToxic(text) {
         if (!toxicityModel) return { isToxic: false, maxScore: 0 };
         
@@ -363,14 +361,14 @@
             moderationMessage.style.display = 'none';
             return { isToxic: false, maxScore };
         } catch (error) {
-            console.warn("Erreur modération:", error);
+            console.warn("Moderation error:", error);
             return { isToxic: false, maxScore: 0 };
         }
     }
     
-    // Gestionnaires d'événements
+    // Setup event listeners
     function setupEventListeners() {
-        // Compteur de caractères
+        // Character counter
         secretInput.addEventListener('input', () => {
             const text = secretInput.value;
             charCount.textContent = text.length;
@@ -378,7 +376,7 @@
             updateSubmitButton();
         });
         
-        // Sélection émotion
+        // Emotion selection
         emotionBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 emotionBtns.forEach(b => b.classList.remove('selected'));
@@ -389,15 +387,15 @@
             });
         });
         
-        // Soumission secret
+        // Secret submission
         submitBtn.addEventListener('click', submitSecret);
         
-        // Actions sur secret
+        // Secret actions
         actionBtns.forEach(btn => {
             btn.addEventListener('click', () => handleSecretAction(btn.dataset.action));
         });
         
-        // Recommencer
+        // Restart button
         restartBtn.addEventListener('click', () => {
             resultContainer.style.display = 'none';
             secretFormContainer.style.display = 'block';
@@ -410,7 +408,7 @@
         });
     }
     
-    // Mise à jour bouton soumission
+    // Update submit button state
     function updateSubmitButton() {
         const text = secretInput.value;
         submitBtn.disabled = !(text.length >= 100 && 
@@ -418,7 +416,7 @@
                               selectedEmotion);
     }
     
-    // Soumission du secret
+    // Submit secret
     async function submitSecret() {
         const secret = secretInput.value.trim();
         
@@ -437,18 +435,18 @@
         submitBtn.disabled = true;
         
         try {
-            // Vérification code
+            // Code detection (less sensitive)
             if (containsCode(secret)) {
-                throw new Error("Texte suspecté comme code. Reformulez en langage naturel.");
+                throw new Error("Your text appears to contain code. Please write in natural language.");
             }
             
-            // Vérification toxicité
+            // Toxicity check
             const toxicityResult = await isToxic(secret);
             if (toxicityResult.isToxic) {
-                throw new Error(`Contenu inapproprié (${Math.round(toxicityResult.maxScore * 100)}%). Veuillez reformuler.`);
+                throw new Error(`Inappropriate content detected (${Math.round(toxicityResult.maxScore * 100)}%). Please rephrase.`);
             }
             
-            // Envoi au serveur
+            // Send to server
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -461,13 +459,13 @@
             
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Erreur serveur');
+                throw new Error(errorData.message || 'Server error');
             }
             
             const result = await response.json();
             if (result.status !== 'success') throw new Error(result.message);
             
-            // Affichage résultat
+            // Show result
             showSecretResult(result);
         } catch (error) {
             handleSubmissionError(error);
@@ -477,14 +475,14 @@
         }
     }
     
-    // Affichage résultat
+    // Show secret result
     function showSecretResult(result) {
         currentRowId = result.rowId;
-        secretResult.textContent = result.exchangeSecret || "Aucun secret similaire trouvé";
+        secretResult.textContent = result.exchangeSecret || "No similar secrets found";
         secretFormContainer.style.display = 'none';
         resultContainer.style.display = 'block';
         
-        // Stats initiales
+        // Initial stats
         secretStats.keep = result.keep || 0;
         secretStats.forget = result.forget || 0;
         secretStats.support = result.support || 0;
@@ -494,19 +492,19 @@
         resultContainer.scrollIntoView({ behavior: 'smooth' });
     }
     
-    // Gestion erreurs soumission
+    // Handle submission errors
     function handleSubmissionError(error) {
-        if (error.message.includes("Contenu inapproprié") || 
-            error.message.includes("Texte suspecté")) {
+        if (error.message.includes("Inappropriate content") || 
+            error.message.includes("Your text appears")) {
             moderationMessage.querySelector('p').textContent = error.message;
             moderationMessage.style.display = 'block';
         } else {
-            console.error("Erreur soumission:", error);
-            alert(`Erreur: ${error.message || 'Problème de connexion'}`);
+            console.error("Submission error:", error);
+            alert(`Error: ${error.message || 'Connection problem'}`);
         }
     }
     
-    // Action sur secret
+    // Handle secret action
     async function handleSecretAction(action) {
         if (actionTaken || !currentRowId) return;
         
@@ -514,17 +512,17 @@
         actionBtns.forEach(b => b.disabled = true);
         
         try {
-            // Mise à jour compteur
+            // Update counter
             const response = await fetch(`${SCRIPT_URL}?action=increment&rowId=${currentRowId}&counterType=${action}`);
-            if (!response.ok) throw new Error('Échec mise à jour');
+            if (!response.ok) throw new Error('Update failed');
             
             const result = await response.json();
             if (result.status !== 'success') throw new Error(result.message);
             
-            // Actualisation stats
+            // Update stats
             await updateSecretStats();
             
-            // Actions spéciales
+            // Special actions
             if (action === 'reveal') {
                 paypalContainer.style.display = 'block';
                 initPaypalButton();
@@ -533,14 +531,14 @@
             
             thankYouMessage.style.display = 'block';
         } catch (error) {
-            console.error("Erreur action:", error);
-            alert(`Erreur: ${error.message}`);
+            console.error("Action error:", error);
+            alert(`Error: ${error.message}`);
             actionBtns.forEach(b => b.disabled = false);
             actionTaken = false;
         }
     }
     
-    // Initialisation bouton PayPal
+    // Initialize PayPal button
     function initPaypalButton() {
         if (window.paypal) {
             paypal.HostedButtons({
@@ -549,11 +547,11 @@
         }
     }
     
-    // Mise à jour stats
+    // Update secret stats
     async function updateSecretStats() {
         try {
             const response = await fetch(`${SCRIPT_URL}?action=getSecretStats&rowId=${currentRowId}`);
-            if (!response.ok) throw new Error('Échec stats');
+            if (!response.ok) throw new Error('Stats update failed');
             
             const result = await response.json();
             if (result.status === 'success') {
@@ -567,11 +565,11 @@
                 statsDisplay.style.display = 'block';
             }
         } catch (error) {
-            console.warn("Erreur stats:", error);
+            console.warn("Stats error:", error);
         }
     }
     
-    // Affichage stats
+    // Update stats display
     function updateStatsDisplay() {
         keepStat.textContent = secretStats.keep;
         forgetStat.textContent = secretStats.forget;
@@ -579,14 +577,14 @@
         revealStat.textContent = secretStats.reveal;
     }
     
-    // Chargement secrets révélés
+    // Load revealed secrets
     async function loadRevealedSecrets() {
         revealedLoading.style.display = 'block';
         revealedSecretsGrid.innerHTML = '';
         
         try {
             const response = await fetch(`${SCRIPT_URL}?action=getRevealedSecrets`);
-            if (!response.ok) throw new Error('Échec chargement');
+            if (!response.ok) throw new Error('Failed to load secrets');
             
             const data = await response.json();
             if (data.status === "success" && data.secrets?.length) {
@@ -603,13 +601,13 @@
         }
     }
     
-    // Création carte secret
+    // Create secret card
     function createSecretCard(secret) {
         const card = document.createElement('div');
         card.className = 'secret-card';
         card.innerHTML = `
             <div class="secret-emotion">${secret.emotion || '😶'}</div>
-            <div class="secret-content">${secret.secret || 'Secret non disponible'}</div>
+            <div class="secret-content">${secret.secret || 'Secret not available'}</div>
             <div class="stats-container">
                 <div class="stat-item keep-stat">
                     <div class="stat-value">${secret.keep || 0}</div>
@@ -632,31 +630,31 @@
         return card;
     }
     
-    // Message absence secrets
+    // Show no secrets message
     function showNoSecretsMessage() {
         revealedSecretsGrid.innerHTML = `
             <div class="no-secrets">
-                <h3>Aucun secret révélé</h3>
-                <p>Soyez le premier à révéler un secret !</p>
+                <h3>No secrets revealed yet</h3>
+                <p>Be the first to reveal a secret!</p>
             </div>
         `;
     }
     
-    // Message erreur secrets
+    // Show secrets error
     function showSecretsError(error) {
         revealedSecretsGrid.innerHTML = `
             <div class="error">
-                <h3>Erreur de chargement</h3>
-                <p>${error.message || 'Problème technique'}</p>
+                <h3>Error loading secrets</h3>
+                <p>${error.message || 'Technical issue'}</p>
             </div>
         `;
     }
     
-    // Chargement stats globales
+    // Load global stats
     async function loadStats() {
         try {
             const response = await fetch(`${SCRIPT_URL}?action=getStats`);
-            if (!response.ok) throw new Error('Échec stats');
+            if (!response.ok) throw new Error('Failed to load stats');
             
             const data = await response.json();
             if (data.status === 'success') {
@@ -670,26 +668,27 @@
                 emotion7.textContent = data.byEmotion?.['😑'] || 0;
             }
         } catch (error) {
-            console.warn("Erreur stats globales:", error);
+            console.warn("Stats error:", error);
         }
     }
     
-    // Initialisation
+    // Initialize app
     async function initializeApp() {
         await initToxicityModel();
         setupEventListeners();
         loadRevealedSecrets();
         loadStats();
         
-        // État initial UI
+        // Initial UI state
         charCount.textContent = secretInput.value.length;
         updateSubmitButton();
         resultContainer.style.display = 'none';
         paypalContainer.style.display = 'none';
         statsDisplay.style.display = 'none';
         thankYouMessage.style.display = 'none';
+        moderationMessage.style.display = 'none';
     }
     
-    // Lancement application
+    // Launch app
     document.addEventListener('DOMContentLoaded', initializeApp);
 </script>
