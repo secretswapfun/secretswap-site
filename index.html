@@ -262,7 +262,7 @@
         const revealedLoading = document.getElementById('revealedLoading');
         const revealedSecretsGrid = document.getElementById('revealedSecretsGrid');
         const paypalContainer = document.getElementById('paypalContainer');
-        const statsDisplay = document.getElementById('极狐statsDisplay');
+        const statsDisplay = document.getElementById('statsDisplay');
         const keepStat = document.getElementById('keepStat');
         const forgetStat = document.getElementById('forgetStat');
         const supportStat = document.getElementById('supportStat');
@@ -446,16 +446,19 @@
                     throw new Error(`Inappropriate content detected (${Math.round(toxicityResult.maxScore * 100)}%). Please rephrase.`);
                 }
                 
-                // Send to server
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'submitSecret',
-                        secret: secret,
-                        emotion: selectedEmotion
-                    })
-                });
+                // Envoi au serveur - AJOUTEZ LES EN-TÊTES ICI
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json' // <-- NÉCESSAIRE POUR GAS
+            },
+            body: JSON.stringify({
+                action: 'submitSecret',
+                secret: secret,
+                emotion: selectedEmotion
+            })
+        });
                 
                 if (!response.ok) {
                     const errorText = await response.text();
