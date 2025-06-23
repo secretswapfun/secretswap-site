@@ -416,42 +416,38 @@
                                   selectedEmotion);
         }
         
-        // Submit secret
-        async function submitSecret() {
-            const secret = secretInput.value.trim();
-            
-            // Validation
-            if (secret.length < 100) {
-                lengthError.style.display = 'block';
-                return;
-            }
-            if (!selectedEmotion) {
-                emotionError.style.display = 'block';
-                return;
-            }
-            
-            moderationMessage.style.display = 'none';
-            loading.style.display = 'block';
-            submitBtn.disabled = true;
-            
-            try {
-                // Code detection (less sensitive)
-                if (containsCode(secret)) {
-                    throw new Error("Your text appears to contain code. Please write in natural language.");
-                }
-                
-                // Toxicity check
-                const toxicityResult = await isToxic(secret);
-                if (toxicityResult.isToxic) {
-                    throw new Error(`Inappropriate content detected (${Math.round(toxicityResult.maxScore * 100)}%). Please rephrase.`);
-                }
-                
-                // Envoi au serveur - AJOUTEZ LES EN-TÊTES ICI
+      async function submitSecret() {
+    const secret = secretInput.value.trim();
+    
+    if (secret.length < 100) {
+        lengthError.style.display = 'block';
+        return;
+    }
+    if (!selectedEmotion) {
+        emotionError.style.display = 'block';
+        return;
+    }
+    
+    moderationMessage.style.display = 'none';
+    loading.style.display = 'block';
+    submitBtn.disabled = true;
+    
+    try {
+        if (containsCode(secret)) {
+            throw new Error("Votre texte semble contenir du code. Veuillez écrire en langage naturel.");
+        }
+        
+        const toxicityResult = await isToxic(secret);
+        if (toxicityResult.isToxic) {
+            throw new Error(`Contenu inapproprié détecté (${Math.round(toxicityResult.maxScore * 100)}%). Veuillez reformuler.`);
+        }
+        
+        // REQUÊTE CORRIGÉE AVEC BONS EN-TÊTES
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'Accept': 'application/json' // <-- NÉCESSAIRE POUR GAS
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 action: 'submitSecret',
@@ -459,27 +455,29 @@
                 emotion: selectedEmotion
             })
         });
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText || 'Server error');
-                }
-                
-                const result = await response.json();
-                if (result.status !== 'success') {
-                    throw new Error(result.message || 'Unknown error');
-                }
-                
-                // Show result
-                showSecretResult(result.data);
-            } catch (error) {
-                handleSubmissionError(error);
-            } finally {
-                loading.style.display = 'none';
-                submitBtn.disabled = false;
-            }
+        
+        // Gestion améliorée des erreurs
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Erreur HTTP ${response.status}`);
         }
         
+        const result = await response.json();
+        
+        if (result.status !== 'success') {
+            throw new Error(result.message || 'Erreur inconnue du serveur');
+        }
+        
+        showSecretResult(result.data);
+    } catch (error) {
+        console.error("Erreur d'envoi:", error);
+        moderationMessage.querySelector('p').textContent = error.message;
+        moderationMessage.style.display = 'block';
+    } finally {
+        loading.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+}
         // Show secret result
         function showSecretResult(result) {
             currentRowId = result.rowId;
