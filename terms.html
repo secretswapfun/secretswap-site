@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SecretSwap Terms of Service - Understand the rules and guidelines for using our anonymous secret sharing platform">
+    <title>SecretSwap - Terms of Service</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a00e0;
+            --secondary: #8e2de2;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #e0e0ff;
+            --success: #00c9a7;
+            --warning: #ff9e00;
+            --danger: #ff3860;
+            --info: #00d1ff;
+            --card-bg: rgba(20, 20, 40, 0.7);
+            --border-radius: 16px;
+            --shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+            --text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            --glow: 0 0 15px rgba(138, 43, 226, 0.5);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: var(--text-shadow);
+            background: linear-gradient(to right, #fff, #c2e9fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeIn 1s ease-out 0.3s both;
+            text-shadow: var(--text-shadow);
+        }
+
+        /* Navigation */
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--light);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+
+        /* Terms Content */
+        .terms-container {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .terms-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .terms-header h2 {
+            font-size: 2.5rem;
+            color: white;
+            position: relative;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .terms-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .terms-header p {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .terms-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(20, 20, 40, 0.5);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--info);
+            transition: var(--transition);
+        }
+
+        .terms-section:hover {
+            transform: translateX(10px);
+            background: rgba(30, 30, 46, 0.8);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: var(--info);
+        }
+
+        .section-title i {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--glow);
+        }
+
+        .terms-content {
+            padding-left: 15px;
+            border-left: 2px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .terms-content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .terms-content ul {
+            padding-left: 30px;
+            margin: 20px 0;
+        }
+
+        .terms-content li {
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .terms-content li::before {
+            content: '•';
+            color: var(--info);
+            font-size: 1.5rem;
+            position: absolute;
+            left: -20px;
+            top: -5px;
+        }
+
+        .warning-note {
+            background: rgba(255, 165, 0, 0.2);
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        /* Acceptance Section */
+        .acceptance-box {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--success);
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        .acceptance-box h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--success);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Animations */
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(138,43,226,0.1) 0%, transparent 70%);
+            z-index: -1;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            width: 200px;
+            height: 200px;
+        }
+        .floating-element:nth-child(2) {
+            top: 40%;
+            right: 5%;
+            width: 150px;
+            height: 150px;
+            animation-delay: 2s;
+            animation-direction: reverse;
+        }
+        .floating-element:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            width: 120px;
+            height: 120px;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(10px, 15px) rotate(5deg); }
+            50% { transform: translate(0, 20px) rotate(0deg); }
+            75% { transform: translate(-10px, 15px) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .terms-header h2 { font-size: 2rem; }
+            .section-title { font-size: 1.5rem; }
+            .terms-container { padding: 20px; }
+            .terms-section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating background elements -->
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-user-secret"></i> SecretSwap</h1>
+            <p class="tagline">Terms of Service - Guidelines for our anonymous community</p>
+        </header>
+        
+        <div class="nav-container">
+            <a href="index.html" class="nav-btn">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <a href="privacy.html" class="nav-btn">
+                <i class="fas fa-shield-alt"></i> Privacy Policy
+            </a>
+        </div>
+        
+        <div class="terms-container">
+            <div class="terms-header">
+                <h2>Terms of Service</h2>
+                <p>Last Updated: June 27, 2025</p>
+                <p>Welcome to SecretSwap! By accessing or using our anonymous secret sharing platform, you agree to comply with and be bound by the following Terms of Service. Please read them carefully.</p>
+            </div>
+            
+            <div class="terms-section">
+                <div class="section-title">
+                    <i class="fas fa-gavel"></i>
+                    <h3>Acceptance of Terms</h3>
+                </div>
+                <div class="terms-content">
+                    <p>By using SecretSwap, you confirm that you:</p>
+                    <ul>
+                        <li>Are at least 13 years of age</li>
+                        <li>Have read, understood, and agree to be bound by these Terms</li>
+                        <li>Will comply with all applicable laws and regulations</li>
+                    </ul>
+                    <p>If you do not agree with any part of these terms, you must not use our service. We reserve the right to modify these terms at any time, and continued use constitutes acceptance.</p>
+                </div>
+            </div>
+            
+            <div class="terms-section">
+                <div class="section-title">
+                    <i class="fas fa-user-secret"></i>
+                    <h3>Your Responsibilities</h3>
+                </div>
+                <div class="terms-content">
+                    <p>As a user of SecretSwap, you agree to:</p>
+                    <ul>
+                        <li>Maintain the anonymity of the platform</li>
+                        <li>Not attempt to identify other users</li>
+                        <li>Not submit content that violates laws or others' rights</li>
+                        <li>Respect the community guidelines</li>
+                    </ul>
+                    <div class="warning-note">
+                        <p><i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> You are solely responsible for the content you submit. SecretSwap does not endorse or verify the accuracy of any secrets shared.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="terms-section">
+                <div class="section-title">
+                    <i class="fas fa-ban"></i>
+                    <h3>Prohibited Content</h3>
+                </div>
+                <div class="terms-content">
+                    <p>You may not submit content that:</p>
+                    <ul>
+                        <li>Contains hate speech or promotes violence</li>
+                        <li>Is sexually explicit or exploitative</li>
+                        <li>Harasses, bullies, or threatens others</li>
+                        <li>Promotes illegal activities or substances</li>
+                        <li>Violates intellectual property rights</li>
+                        <li>Contains malware or malicious code</li>
+                    </ul>
+                    <p>We use AI-powered moderation to detect and remove prohibited content. Violations may result in immediate termination of access.</p>
+                </div>
+            </div>
+            
+            <div class="terms-section">
+                <div class="section-title">
+                    <i class="fas fa-lock"></i>
+                    <h3>Accountability and Anonymity</h3>
+                </div>
+                <div class="terms-content">
+                    <p>While SecretSwap is designed for anonymity:</p>
+                    <ul>
+                        <li>We may cooperate with law enforcement for serious legal violations</li>
+                        <li>We reserve the right to investigate abuse reports</li>
+                        <li>You remain legally responsible for your content</li>
+                    </ul>
+                    <p>SecretSwap cannot protect you from legal consequences if your content violates laws. Our anonymity features protect your identity from other users, not from lawful investigations.</p>
+                </div>
+            </div>
+            
+            <div class="terms-section">
+                <div class="section-title">
+                    <i class="fas fa-copyright"></i>
+                    <h3>Intellectual Property</h3>
+                </div>
+                <div class="terms-content">
+                    <p>Regarding content ownership:</p>
+                    <ul>
+                        <li>You retain ownership of the content you submit</li>
+                        <li>By posting, you grant us a license to display and distribute your content</li>
+                        <li>SecretSwap's branding, design, and code remain our exclusive property</li>
+                    </ul>
+                    <p>The license you grant us is royalty-free, worldwide, and non-exclusive, allowing us to operate and improve the service.</p>
+                </div>
+            </div>
+            
+            <div class="terms-section">
+                <div class="section-title">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3>Service Modifications</h3>
+                </div>
+                <div class="terms-content">
+                    <p>We reserve the right to:</p>
+                    <ul>
+                        <li>Modify or discontinue the service at any time</li>
+                        <li>Change features or functionality without notice</li>
+                        <li>Limit access to the service for maintenance or security</li>
+                        <li>Terminate accounts for violations of these terms</li>
+                    </ul>
+                    <p>We will make reasonable efforts to notify users of significant changes to the service, but are not obligated to do so.</p>
+                </div>
+            </div>
+            
+            <div class="terms-section">
+                <div class="section-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Disclaimer of Warranties</h3>
+                </div>
+                <div class="terms-content">
+                    <p>SecretSwap is provided "as is" without warranties of any kind:</p>
+                    <ul>
+                        <li>We do not guarantee uninterrupted or error-free service</li>
+                        <li>We make no warranties about content accuracy</li>
+                        <li>We do not endorse any user-submitted content</li>
+                        <li>We provide no warranty against harmful content</li>
+                    </ul>
+                    <p>Your use of the service is at your own risk. We disclaim all warranties, express or implied, to the fullest extent permitted by law.</p>
+                </div>
+            </div>
+            
+            <div class="acceptance-box">
+                <h3><i class="fas fa-check-circle"></i> Your Agreement</h3>
+                <p>By using SecretSwap, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. If you do not agree to these terms, please discontinue use of our service immediately.</p>
+                <p>These terms constitute the entire agreement between you and SecretSwap regarding your use of the platform.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>SecretSwap - Anonymous Secret Exchange Platform</p>
+            <p><a href="privacy.html" style="color: var(--info);">Privacy Policy</a> | <a href="terms.html" style="color: var(--info);">Terms of Service</a> | © 2025 All Rights Reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simple animations for terms sections
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.terms-section');
+            
+            sections.forEach((section, index) => {
+                // Add delay for staggered animation
+                section.style.animationDelay = `${index * 0.1}s`;
+                section.style.animation = 'slideIn 0.5s ease-out forwards';
+                section.style.opacity = '0';
+            });
+            
+            // Floating elements animation
+            const floatingElements = document.querySelectorAll('.floating-element');
+            floatingElements.forEach(el => {
+                const duration = 15 + Math.random() * 10;
+                el.style.animationDuration = `${duration}s`;
+            });
+        });
+    </script>
+</body>
+</html>
