@@ -35,7 +35,8 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.9;
+            object-position: center;
+            opacity: 1; /* Suppression de l'opacité réduite */
         }
         
         .background-overlay {
@@ -44,7 +45,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9));
+            background: rgba(0, 0, 0, 0.3); /* Overlay plus clair */
         }
         
         .content {
@@ -75,12 +76,16 @@
         .tagline {
             font-size: 1.2rem;
             letter-spacing: 2px;
-            color: #cccccc;
+            color: #ffffff;
             font-weight: 300;
         }
         
-        .boutique-button {
+        .boutique-button-container {
             margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .boutique-button {
             padding: 1.2rem 3rem;
             background: linear-gradient(45deg, #8a2be2, #4b0082);
             color: white;
@@ -110,20 +115,23 @@
         
         .description {
             max-width: 600px;
-            margin: 2rem auto 0;
+            margin: 0 auto;
             font-size: 1.1rem;
             line-height: 1.6;
-            color: #dddddd;
+            color: #ffffff;
             font-weight: 300;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 10px;
         }
         
         .footer {
             padding: 1.5rem;
             text-align: center;
-            color: #aaaaaa;
+            color: #ffffff;
             font-size: 0.9rem;
             z-index: 1;
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.5);
         }
         
         .footer a {
@@ -136,6 +144,7 @@
             color: #ffffff;
         }
         
+        /* Media queries pour différents appareils */
         @media (max-width: 768px) {
             .logo {
                 font-size: 2.5rem;
@@ -152,7 +161,15 @@
             
             .description {
                 font-size: 1rem;
-                padding: 0 1rem;
+                padding: 1rem;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            /* Pour les grands écrans PC */
+            .background-image {
+                object-fit: contain; /* Empêche l'agrandissement excessif */
+                background-color: #000; /* Ajout d'un fond noir pour les bords */
             }
         }
         
@@ -185,11 +202,11 @@
             }
         }
         
-        .logo-container, .boutique-button, .description {
+        .logo-container, .boutique-button-container, .description {
             animation: fadeInUp 0.8s ease-out forwards;
         }
         
-        .boutique-button {
+        .boutique-button-container {
             animation-delay: 0.3s;
             opacity: 0;
         }
@@ -197,6 +214,12 @@
         .description {
             animation-delay: 0.6s;
             opacity: 0;
+        }
+        
+        /* Correction du problème d'affichage du bouton */
+        .boutique-button {
+            position: relative;
+            z-index: 10;
         }
     </style>
 </head>
@@ -209,23 +232,26 @@
     
     <div class="content">
         <div class="logo-container">
-            <h1 class="logo">...</h1>
-            <p class="tagline">Créations uniques faites mains</p>
+            <h1 class="logo">Zadart</h1>
+            <p class="tagline">Créations uniques & design contemporain</p>
         </div>
         
-        <a href="https://zadart.base44.app" target="_blank" class="boutique-button">
-            Visiter la boutique
-        </a>
+        <div class="boutique-button-container">
+            <a href="https://zadart.base44.app" target="_blank" class="boutique-button">
+                Visiter la boutique
+            </a>
+        </div>
         
         <p class="description">
-            Découvrez notre collection exclusive d'œuvres d'art. 
-            Chaque pièce est soigneusement fabriquée avec amour et apportera une touche d'originalité à votre espace.
+            Découvrez notre collection exclusive d'œuvres d'art et de design. 
+            Chaque pièce est soigneusement sélectionnée pour apporter une touche d'élégance 
+            et d'originalité à votre espace.
         </p>
     </div>
     
     <div class="footer">
         <p>&copy; 2023 Zadart. Tous droits réservés. 
-           <a href="https://zadart.base44.app" target="_blank">Visiter la boutique</a>
+           <a href="https://zadart.base44.app" target="_blank">Accéder à la boutique en ligne</a>
         </p>
     </div>
 
@@ -256,6 +282,24 @@
                     this.style.animation = 'pulse 3s infinite';
                 }, 10);
             });
+            
+            // Ajuster l'image de fond pour les grands écrans
+            function adjustBackgroundForLargeScreens() {
+                const bgImage = document.getElementById('background-image');
+                const screenWidth = window.innerWidth;
+                
+                if (screenWidth > 1200) {
+                    // Pour les très grands écrans, on limite l'agrandissement de l'image
+                    bgImage.style.objectFit = 'contain';
+                } else {
+                    // Pour les écrans plus petits, on utilise 'cover' pour remplir l'écran
+                    bgImage.style.objectFit = 'cover';
+                }
+            }
+            
+            // Ajuster au chargement et lors du redimensionnement
+            adjustBackgroundForLargeScreens();
+            window.addEventListener('resize', adjustBackgroundForLargeScreens);
         });
     </script>
 </body>
