@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadart - Page d'accueil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .background-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+        
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9));
+        }
+        
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            z-index: 1;
+        }
+        
+        .logo-container {
+            margin-bottom: 2.5rem;
+        }
+        
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: #cccccc;
+            font-weight: 300;
+        }
+        
+        .boutique-button {
+            margin-top: 2rem;
+            padding: 1.2rem 3rem;
+            background: linear-gradient(45deg, #8a2be2, #4b0082);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .boutique-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.6);
+            background: linear-gradient(45deg, #9a3bf2, #5b0092);
+        }
+        
+        .boutique-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 10px rgba(138, 43, 226, 0.4);
+        }
+        
+        .description {
+            max-width: 600px;
+            margin: 2rem auto 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #dddddd;
+            font-weight: 300;
+        }
+        
+        .footer {
+            padding: 1.5rem;
+            text-align: center;
+            color: #aaaaaa;
+            font-size: 0.9rem;
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        .footer a {
+            color: #bbbbbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: #ffffff;
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .tagline {
+                font-size: 1rem;
+            }
+            
+            .boutique-button {
+                padding: 1rem 2.5rem;
+                font-size: 1.1rem;
+            }
+            
+            .description {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+        }
+        
+        /* Animation pour le bouton */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            }
+            50% {
+                box-shadow: 0 5px 25px rgba(138, 43, 226, 0.7);
+            }
+            100% {
+                box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            }
+        }
+        
+        .boutique-button {
+            animation: pulse 3s infinite;
+        }
+        
+        /* Animation d'apparition pour le contenu */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo-container, .boutique-button, .description {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .boutique-button {
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+        
+        .description {
+            animation-delay: 0.6s;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <!-- L'image de fond sera chargée ici -->
+        <img src="whatnot.jpg" alt="Fond Zadart" class="background-image" id="background-image">
+        <div class="background-overlay"></div>
+    </div>
+    
+    <div class="content">
+        <div class="logo-container">
+            <h1 class="logo">...</h1>
+            <p class="tagline">Créations uniques faites mains</p>
+        </div>
+        
+        <a href="https://zadart.base44.app" target="_blank" class="boutique-button">
+            Visiter la boutique
+        </a>
+        
+        <p class="description">
+            Découvrez notre collection exclusive d'œuvres d'art. 
+            Chaque pièce est soigneusement fabriquée avec amour et apportera une touche d'originalité à votre espace.
+        </p>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2023 Zadart. Tous droits réservés. 
+           <a href="https://zadart.base44.app" target="_blank">Visiter la boutique</a>
+        </p>
+    </div>
+
+    <script>
+        // Gestion de l'image de fond
+        document.addEventListener('DOMContentLoaded', function() {
+            const bgImage = document.getElementById('background-image');
+            
+            // Vérifier si l'image est chargée, sinon utiliser un fond de secours
+            bgImage.onerror = function() {
+                console.log("L'image de fond n'a pas pu être chargée. Utilisation d'un fond de secours.");
+                bgImage.style.display = 'none';
+                document.querySelector('.background-container').style.background = 'linear-gradient(to right, #0f0c29, #302b63, #24243e)';
+            };
+            
+            // Effet de parallaxe léger sur le défilement
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const bg = document.querySelector('.background-container');
+                bg.style.transform = 'translateY(' + (scrolled * 0.5) + 'px)';
+            });
+            
+            // Animation supplémentaire pour le bouton au survol
+            const button = document.querySelector('.boutique-button');
+            button.addEventListener('mouseenter', function() {
+                this.style.animation = 'none';
+                setTimeout(() => {
+                    this.style.animation = 'pulse 3s infinite';
+                }, 10);
+            });
+        });
+    </script>
+</body>
+</html>
