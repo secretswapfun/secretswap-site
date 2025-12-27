@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zadart - Page d'accueil</title>
+    <title>Zadart - Créations uniques faites mains</title>
     <style>
         * {
             margin: 0;
@@ -35,8 +35,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
-            opacity: 1; /* Suppression de l'opacité réduite */
+            opacity: 0.9;
         }
         
         .background-overlay {
@@ -45,7 +44,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.3); /* Overlay plus clair */
+            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9));
         }
         
         .content {
@@ -59,11 +58,23 @@
             z-index: 1;
         }
         
-        .logo-container {
+        .logo-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin-bottom: 2.5rem;
         }
         
-        .logo {
+        .logo-img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1.5rem;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo-text {
             font-size: 3.5rem;
             font-weight: 700;
             letter-spacing: 4px;
@@ -76,11 +87,15 @@
         .tagline {
             font-size: 1.2rem;
             letter-spacing: 2px;
-            color: #ffffff;
+            color: #cccccc;
             font-weight: 300;
         }
         
-        .boutique-button-container {
+        .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
             margin-top: 2rem;
             margin-bottom: 2rem;
         }
@@ -100,27 +115,63 @@
             box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
             text-decoration: none;
             display: inline-block;
+            min-width: 280px;
+            position: relative;
+            overflow: hidden;
         }
         
-        .boutique-button:hover {
+        .boutique-button.zadart:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(138, 43, 226, 0.6);
             background: linear-gradient(45deg, #9a3bf2, #5b0092);
         }
         
-        .boutique-button:active {
-            transform: translateY(1px);
-            box-shadow: 0 3px 10px rgba(138, 43, 226, 0.4);
+        .boutique-button.pokemon {
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+        }
+        
+        .boutique-button.pokemon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.6);
+            background: linear-gradient(45deg, #ff3333, #dd0000);
+        }
+        
+        .boutique-button.pokemon .button-text {
+            transition: all 0.3s ease;
+        }
+        
+        .boutique-button.pokemon:hover .button-text {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        
+        .boutique-button.pokemon::after {
+            content: "Ouvert bientôt";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .boutique-button.pokemon:hover::after {
+            opacity: 1;
         }
         
         .description {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 2rem auto 0;
             font-size: 1.1rem;
             line-height: 1.6;
-            color: #ffffff;
+            color: #dddddd;
             font-weight: 300;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.3);
             padding: 1.5rem;
             border-radius: 10px;
         }
@@ -128,10 +179,10 @@
         .footer {
             padding: 1.5rem;
             text-align: center;
-            color: #ffffff;
+            color: #aaaaaa;
             font-size: 0.9rem;
             z-index: 1;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.3);
         }
         
         .footer a {
@@ -144,9 +195,13 @@
             color: #ffffff;
         }
         
-        /* Media queries pour différents appareils */
         @media (max-width: 768px) {
-            .logo {
+            .logo-img {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo-text {
                 font-size: 2.5rem;
             }
             
@@ -154,9 +209,15 @@
                 font-size: 1rem;
             }
             
+            .buttons-container {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
             .boutique-button {
                 padding: 1rem 2.5rem;
                 font-size: 1.1rem;
+                min-width: 250px;
             }
             
             .description {
@@ -165,15 +226,7 @@
             }
         }
         
-        @media (min-width: 1200px) {
-            /* Pour les grands écrans PC */
-            .background-image {
-                object-fit: contain; /* Empêche l'agrandissement excessif */
-                background-color: #000; /* Ajout d'un fond noir pour les bords */
-            }
-        }
-        
-        /* Animation pour le bouton */
+        /* Animation pour les boutons */
         @keyframes pulse {
             0% {
                 box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
@@ -186,8 +239,24 @@
             }
         }
         
-        .boutique-button {
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 5px 25px rgba(255, 0, 0, 0.7);
+            }
+            100% {
+                box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+            }
+        }
+        
+        .boutique-button.zadart {
             animation: pulse 3s infinite;
+        }
+        
+        .boutique-button.pokemon {
+            animation: pulse-red 3s infinite;
         }
         
         /* Animation d'apparition pour le contenu */
@@ -202,11 +271,11 @@
             }
         }
         
-        .logo-container, .boutique-button-container, .description {
+        .logo-header, .buttons-container, .description {
             animation: fadeInUp 0.8s ease-out forwards;
         }
         
-        .boutique-button-container {
+        .buttons-container {
             animation-delay: 0.3s;
             opacity: 0;
         }
@@ -215,36 +284,35 @@
             animation-delay: 0.6s;
             opacity: 0;
         }
-        
-        /* Correction du problème d'affichage du bouton */
-        .boutique-button {
-            position: relative;
-            z-index: 10;
-        }
     </style>
 </head>
 <body>
     <div class="background-container">
-        <!-- L'image de fond sera chargée ici -->
         <img src="whatnot.jpg" alt="Fond Zadart" class="background-image" id="background-image">
         <div class="background-overlay"></div>
     </div>
     
     <div class="content">
-        <div class="logo-container">
-            <h1 class="logo">Fan de pokemon ?</h1>
-            <p class="tagline">Créations uniques faites mains</p>
+        <div class="logo-header">
+            <img src="logo.png" alt="Logo Zadart" class="logo-img" id="logo-img">
+            <h1 class="logo-text">Zadart</h1>
+            <p class="tagline">Créations uniques faites mains par Zadart</p>
         </div>
         
-        <div class="boutique-button-container">
-            <a href="https://zadart.base44.app" target="_blank" class="boutique-button">
-                Visiter la boutique de création 
+        <div class="buttons-container">
+            <a href="https://zadart.base44.app" target="_blank" class="boutique-button zadart">
+                <span class="button-text">Visiter la boutique de création</span>
+            </a>
+            
+            <a href="#" class="boutique-button pokemon">
+                <span class="button-text">Visiter la boutique Pokemon</span>
             </a>
         </div>
         
         <p class="description">
-            Découvrez notre collection exclusive d'œuvres d'art. 
-            Chaque pièce est soigneusement fabriquée avec amour et apportera une touche d'originalité à votre espace.
+            Découvrez notre collection exclusive de création artistique. 
+            Chaque pièce est soigneusement fabriquée avec amour pour apporter 
+            une touche d'originalité à votre espace.
         </p>
     </div>
     
@@ -255,15 +323,22 @@
     </div>
 
     <script>
-        // Gestion de l'image de fond
+        // Gestion des images
         document.addEventListener('DOMContentLoaded', function() {
             const bgImage = document.getElementById('background-image');
+            const logoImage = document.getElementById('logo-img');
             
-            // Vérifier si l'image est chargée, sinon utiliser un fond de secours
+            // Vérifier si l'image de fond est chargée
             bgImage.onerror = function() {
                 console.log("L'image de fond n'a pas pu être chargée. Utilisation d'un fond de secours.");
                 bgImage.style.display = 'none';
                 document.querySelector('.background-container').style.background = 'linear-gradient(to right, #0f0c29, #302b63, #24243e)';
+            };
+            
+            // Vérifier si le logo est chargé
+            logoImage.onerror = function() {
+                console.log("Le logo n'a pas pu être chargé. Utilisation d'un logo texte.");
+                logoImage.style.display = 'none';
             };
             
             // Effet de parallaxe léger sur le défilement
@@ -273,32 +348,30 @@
                 bg.style.transform = 'translateY(' + (scrolled * 0.5) + 'px)';
             });
             
-            // Animation supplémentaire pour le bouton au survol
-            const button = document.querySelector('.boutique-button');
-            button.addEventListener('mouseenter', function() {
-                this.style.animation = 'none';
-                setTimeout(() => {
-                    this.style.animation = 'pulse 3s infinite';
-                }, 10);
+            // Animation supplémentaire pour les boutons au survol
+            const buttons = document.querySelectorAll('.boutique-button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    if (this.classList.contains('zadart')) {
+                        this.style.animation = 'none';
+                        setTimeout(() => {
+                            this.style.animation = 'pulse 3s infinite';
+                        }, 10);
+                    } else if (this.classList.contains('pokemon')) {
+                        this.style.animation = 'none';
+                        setTimeout(() => {
+                            this.style.animation = 'pulse-red 3s infinite';
+                        }, 10);
+                    }
+                });
             });
             
-            // Ajuster l'image de fond pour les grands écrans
-            function adjustBackgroundForLargeScreens() {
-                const bgImage = document.getElementById('background-image');
-                const screenWidth = window.innerWidth;
-                
-                if (screenWidth > 1200) {
-                    // Pour les très grands écrans, on limite l'agrandissement de l'image
-                    bgImage.style.objectFit = 'contain';
-                } else {
-                    // Pour les écrans plus petits, on utilise 'cover' pour remplir l'écran
-                    bgImage.style.objectFit = 'cover';
-                }
-            }
-            
-            // Ajuster au chargement et lors du redimensionnement
-            adjustBackgroundForLargeScreens();
-            window.addEventListener('resize', adjustBackgroundForLargeScreens);
+            // Empêcher le lien Pokémon de fonctionner (bouton désactivé)
+            const pokemonButton = document.querySelector('.boutique-button.pokemon');
+            pokemonButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert("La boutique Pokémon ouvrira bientôt !");
+            });
         });
     </script>
 </body>
